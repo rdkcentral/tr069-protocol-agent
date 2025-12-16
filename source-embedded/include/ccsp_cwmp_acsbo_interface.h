@@ -19,13 +19,13 @@
 
 /**********************************************************************
    Copyright [2014] [Cisco Systems, Inc.]
- 
+
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
- 
+
        http://www.apache.org/licenses/LICENSE-2.0
- 
+
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -99,12 +99,39 @@
  * Since we write all kernel modules in C (due to better performance and lack of compiler support),
  * we have to simulate the C++ object by encapsulating a set of functions inside a data structure.
  */
+
+/**
+ * @brief Get context handle from the ACS Broker object.
+ *
+ * This function pointer type defines the signature for retrieving a context handle
+ * associated with the CCSP CWMP ACS Broker object.
+ *
+ * @param[in] hThisObject - Handle to the CCSP CWMP ACS Broker object.
+ *
+ * @return Handle to the context object, or NULL if no context is set.
+ * @retval Handle to the context object on success
+ * @retval NULL if no context is set.
+ *
+ */
 typedef  ANSC_HANDLE
 (*PFN_CWMPACSBO_GET_CONTEXT)
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/**
+ * @brief Set context handle for the ACS Broker object.
+ *
+ * This function pointer type defines the signature for setting a context handle
+ * in the CCSP CWMP ACS Broker object.
+ *
+ * @param[in] hThisObject - Handle to the CCSP CWMP ACS Broker object.
+ * @param[in] hContext    - Handle to the context object to be set.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS if the operation is successful.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPACSBO_SET_CONTEXT)
     (
@@ -112,12 +139,37 @@ typedef  ANSC_STATUS
         ANSC_HANDLE                 hContext
     );
 
+/**
+ * @brief Get interface handle from the ACS Broker object.
+ *
+ * This function pointer type defines the signature for retrieving an interface handle
+ * from the CCSP CWMP ACS Broker object.
+ *
+ * @param[in] hThisObject - Handle to the CCSP CWMP ACS Broker object.
+ *
+ * @return Handle to the interface object, or NULL if the interface is not available.
+ * @retval Handle to the interface object on success.
+ * @retval NULL if the interface is not available.
+ *
+ */
 typedef  ANSC_HANDLE
 (*PFN_CWMPACSBO_GET_IF)
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/**
+ * @brief Set interface handle for the ACS Broker object.
+ *
+ * This function pointer type defines the signature for setting an interface handle
+ * in the CCSP CWMP ACS Broker object.
+ *
+ * @param[in] hThisObject - Handle to the CCSP CWMP ACS Broker object.
+ * @param[in] hInterface  - Handle to the interface object to be set.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS if the operation is successful.
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPACSBO_SET_IF)
     (
@@ -125,6 +177,19 @@ typedef  ANSC_STATUS
         ANSC_HANDLE                 hInterface
     );
 
+/**
+ * @brief Get property data from the ACS Broker object.
+ *
+ * This function pointer type defines the signature for retrieving the property
+ * structure of the CCSP CWMP ACS Broker object.
+ *
+ * @param[in]  hThisObject - Handle to the CCSP CWMP ACS Broker object.
+ * @param[out] hProperty   - Handle to the property structure to be filled with current property values.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS if the operation is successful.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPACSBO_GET_PROPERTY)
     (
@@ -132,6 +197,19 @@ typedef  ANSC_STATUS
         ANSC_HANDLE                 hProperty
     );
 
+/**
+ * @brief Set property data for the ACS Broker object.
+ *
+ * This function pointer type defines the signature for configuring the property
+ * structure of the CCSP CWMP ACS Broker object.
+ *
+ * @param[in] hThisObject - Handle to the CCSP CWMP ACS Broker object.
+ * @param[in] hProperty   - Handle to the property structure containing new configuration values.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS if the operation is successful.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPACSBO_SET_PROPERTY)
     (
@@ -139,42 +217,122 @@ typedef  ANSC_STATUS
         ANSC_HANDLE                 hProperty
     );
 
+/**
+ * @brief Reset the ACS Broker object to its initial state.
+ *
+ * This function pointer type defines the signature for resetting the CCSP CWMP ACS Broker object.
+ *
+ * @param[in] hThisObject - Handle to the CCSP CWMP ACS Broker object.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS if the operation is successful.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPACSBO_RESET)
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/**
+ * @brief Acquire access control for the ACS Broker object.
+ *
+ * This function pointer type defines the signature for acquiring exclusive or controlled
+ * access to the CCSP CWMP ACS Broker object.
+ *
+ * @param[in] hThisObject - Handle to the CCSP CWMP ACS Broker object.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS if access is successfully acquired.
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPACSBO_ACQ_ACCESS)
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/**
+ * @brief Release access control for the ACS Broker object.
+ *
+ * This function pointer type defines the signature for releasing previously acquired
+ * access to the CCSP CWMP ACS Broker object.
+ *
+ * @param[in] hThisObject - Handle to the CCSP CWMP ACS Broker object.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS if access is successfully released.
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPACSBO_REL_ACCESS)
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/**
+ * @brief Engage the ACS Broker object to start operations.
+ *
+ * This function pointer type defines the signature for engaging or activating the
+ * CCSP CWMP ACS Broker object.
+ *
+ * @param[in] hThisObject - Handle to the CCSP CWMP ACS Broker object.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS if the ACS Broker is successfully engaged.
+ * @retval ANSC_STATUS_NOT_READY if the CPE Controller is not configured.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPACSBO_ENGAGE)
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/**
+ * @brief Cancel the ACS Broker object operations.
+ *
+ * This function pointer type defines the signature for canceling or deactivating the
+ * CCSP CWMP ACS Broker object.
+ *
+ * @param[in] hThisObject - Handle to the CCSP CWMP ACS Broker object.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS if the ACS Broker is successfully canceled.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPACSBO_CANCEL)
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/**
+ * @brief Setup the operating environment for the ACS Broker object.
+ *
+ * This function pointer type defines the signature for setting up the runtime environment
+ * required by the CCSP CWMP ACS Broker object.
+ *
+ * @param[in] hThisObject - Handle to the CCSP CWMP ACS Broker object.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS if the environment is successfully set up.
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPACSBO_SETUP_ENV)
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/**
+ * @brief Close the operating environment for the ACS Broker object.
+ *
+ * This function pointer type defines the signature for cleaning up the runtime environment
+ * used by the CCSP CWMP ACS Broker object.
+ *
+ * @param[in] hThisObject - Handle to the CCSP CWMP ACS Broker object.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS if the environment is successfully closed.
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPACSBO_CLOSE_ENV)
     (
@@ -229,4 +387,3 @@ CCSP_CWMP_ACS_BROKER_OBJECT,  *PCCSP_CWMP_ACS_BROKER_OBJECT;
 
 
 #endif
-

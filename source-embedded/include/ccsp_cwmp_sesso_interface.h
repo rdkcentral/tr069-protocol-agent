@@ -19,13 +19,13 @@
 
 /**********************************************************************
    Copyright [2014] [Cisco Systems, Inc.]
- 
+
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
- 
+
        http://www.apache.org/licenses/LICENSE-2.0
- 
+
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -112,12 +112,25 @@
 #define  CCSP_CWMPSO_SESSION_STATE_timeout           6
 #define  CCSP_CWMPSO_SESSION_STATE_reconnect         7
 
-#define  CCSP_CWMPSO_EVENTCODE_ValueChange           4 
+#define  CCSP_CWMPSO_EVENTCODE_ValueChange           4
 #define  CCSP_CWMPSO_EVENTCODE_ConnectionRequest     6
 
 /*
  * Since we write all kernel modules in C (due to better performance and lack of compiler support),
  * we have to simulate the C++ object by encapsulating a set of functions inside a data structure.
+ */
+/**
+ * @brief Get a context handle from the CWMP Session object.
+ *
+ * This function pointer typedef defines the callback interface for retrieving context handles
+ * from the CWMP Session.
+ *
+ * @param[in] hThisObject - Handle to the CWMP Session object instance.
+ *
+ * @return Handle to the requested context object.
+ * @return Handle to the requested context object on success.
+ * @return NULL if not available.
+ *
  */
 typedef  ANSC_HANDLE
 (*PFN_CWMPSESSO_GET_CONTEXT)
@@ -125,6 +138,18 @@ typedef  ANSC_HANDLE
         ANSC_HANDLE                 hThisObject
     );
 
+/**
+ * @brief Set a context handle in the CWMP Session object.
+ *
+ * This function pointer typedef defines the callback interface for setting context handles in the CWMP Session.
+ *
+ * @param[in] hThisObject - Handle to the CWMP Session object instance.
+ * @param[in] hContext    - Handle to the context object to be set.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS - Context handle set successfully.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPSESSO_SET_CONTEXT)
     (
@@ -132,12 +157,38 @@ typedef  ANSC_STATUS
         ANSC_HANDLE                 hContext
     );
 
+/**
+ * @brief Get an interface handle from the CWMP Session object.
+ *
+ * This function pointer typedef defines the callback interface for retrieving interface handles
+ * from the CWMP Session. Used to get handles to interface objects such as the Management Client
+ * Operation (MCO) interface.
+ *
+ * @param[in] hThisObject - Handle to the CWMP Session object instance.
+ *
+ * @return Handle to the requested interface object.
+ * @retval Handle to the requested interface object on success.
+ * @retval NULL if not available.
+ *
+ */
 typedef  ANSC_HANDLE
 (*PFN_CWMPSESSO_GET_IF)
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/**
+ * @brief Set an interface handle in the CWMP Session object.
+ *
+ * This function pointer typedef defines the callback interface for setting interface handles in the CWMP Session.
+ *
+ * @param[in] hThisObject - Handle to the CWMP Session object instance.
+ * @param[in] hInterface  - Handle to the interface object to be set.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS - Interface handle set successfully.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPSESSO_SET_IF)
     (
@@ -145,12 +196,38 @@ typedef  ANSC_STATUS
         ANSC_HANDLE                 hInterface
     );
 
+/**
+ * @brief Get a name string from the CWMP Session object.
+ *
+ * This function pointer typedef defines the callback interface for retrieving name strings
+ * from the CWMP Session.
+ *
+ * @param[in] hThisObject - Handle to the CWMP Session object instance.
+ *
+ * @return Pointer to the name string.
+ * @retval Pointer to the name string on success.
+ * @retval NULL if not available.
+ *
+ */
 typedef  char*
 (*PFN_CWMPSESSO_GET_NAME)
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/**
+ * @brief Set a name string in the CWMP Session object.
+ *
+ * This function pointer typedef defines the callback interface for setting name strings
+ * in the CWMP Session.
+ *
+ * @param[in] hThisObject - Handle to the CWMP Session object instance.
+ * @param[in] pName       - Pointer to the name string to set.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS - Name string set successfully.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPSESSO_SET_NAME)
     (
@@ -158,6 +235,20 @@ typedef  ANSC_STATUS
         char*                       pName
     );
 
+/**
+ * @brief Get the property configuration from the CWMP Session object.
+ *
+ * This function pointer typedef defines the callback interface for retrieving the property
+ * configuration structure from the CWMP Session. Properties include session-specific settings
+ * and operational parameters.
+ *
+ * @param[in]  hThisObject - Handle to the CWMP Session object instance.
+ * @param[out] hProperty   - Handle to the property structure to be filled with current property values.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS - Property configuration retrieved successfully.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPSESSO_GET_PROPERTY)
     (
@@ -165,6 +256,19 @@ typedef  ANSC_STATUS
         ANSC_HANDLE                 hProperty
     );
 
+/**
+ * @brief Set the property configuration in the CWMP Session object.
+ *
+ * This function pointer typedef defines the callback interface for setting the property
+ * configuration structure in the CWMP Session.
+ *
+ * @param[in] hThisObject - Handle to the CWMP Session object instance.
+ * @param[in] hProperty   - Handle to the property structure containing new property values to be set.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS - Property configuration set successfully.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPSESSO_SET_PROPERTY)
     (
@@ -172,60 +276,181 @@ typedef  ANSC_STATUS
         ANSC_HANDLE                 hProperty
     );
 
+/**
+ * @brief Reset the CWMP Session object to initial state.
+ *
+ * This function pointer typedef defines the callback interface for resetting the CWMP Session object.
+ *
+ * @param[in] hThisObject - Handle to the CWMP Session object instance.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS - Session reset successfully.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPSESSO_RESET)
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/**
+ * @brief Acquire access lock for the CWMP Session object.
+ *
+ * This function pointer typedef defines the callback interface for acquiring the access lock
+ * to the CWMP Session object.
+ *
+ * @param[in] hThisObject - Handle to the CWMP Session object instance.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS - Access lock acquired successfully.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPSESSO_ACQ_ACCESS)
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/**
+ * @brief Release access lock for the CWMP Session object.
+ *
+ * This function pointer typedef defines the callback interface for releasing the access lock
+ * on the CWMP Session object.
+ *
+ * @param[in] hThisObject - Handle to the CWMP Session object instance.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS - Access lock released successfully.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPSESSO_REL_ACCESS)
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/**
+ * @brief Invoke a timer callback in the CWMP Session object.
+ *
+ * This function pointer typedef defines the callback interface for timer invocation operations.
+ * Used for session timer callbacks, retry timer callbacks, and delayed active notification timer.
+ *
+ * @param[in] hThisObject - Handle to the CWMP Session object instance.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS - Timer callback invoked successfully.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPSESSO_INVOKE)
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/**
+ * @brief Check if the session is connected to the ACS.
+ *
+ * This function pointer typedef defines the callback interface for checking whether the CWMP
+ * Session has an active connection to the ACS.
+ *
+ * @param[in] hThisObject - Handle to the CWMP Session object instance.
+ *
+ * @return Boolean indicating connection status.
+ * @retval TRUE  - Session is connected to the ACS.
+ * @retval FALSE - Session is not connected to the ACS.
+ *
+ */
 typedef  BOOL
 (*PFN_CWMPSESSO_IS_CONNECTED)
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/**
+ * @brief Connect the session to the ACS.
+ *
+ * This function pointer typedef defines the callback interface for establishing a connection
+ * to the ACS.  Connection uses ACS URL from the CPE Controller configuration.
+ *
+ * @param[in] hThisObject - Handle to the CWMP Session object instance.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS - Connection to ACS established successfully.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPSESSO_CONNECT)
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/**
+ * @brief Close the connection to the ACS.
+ *
+ * This function pointer typedef defines the callback interface for closing the active connection
+ * to the ACS. Called when both CPE and ACS have no more requests to exchange.
+ *
+ * @param[in] hThisObject - Handle to the CWMP Session object instance.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS - Connection to ACS closed successfully.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPSESSO_CLOSE_CONN)
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/**
+ * @brief Reboot the CPE device.
+ *
+ * This function pointer typedef defines the callback interface for initiating a CPE reboot.
+ *
+ * @param[in] hThisObject - Handle to the CWMP Session object instance.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS - Reboot initiated successfully.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPSESSO_REBOOT)
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/**
+ * @brief Perform session operations.
+ *
+ * This function pointer typedef defines the callback interface for performing general session operations.
+ *
+ * @param[in] hThisObject - Handle to the CWMP Session object instance.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS - Session operations performed successfully.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPSESSO_PERFORM)
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/**
+ * @brief Add a CWMP event to the session's event queue.
+ *
+ * This function pointer typedef defines the callback interface for adding a CWMP event to the
+ * session for inclusion in the next Inform method call to ACS.
+ *
+ * @param[in] hThisObject  - Handle to the CWMP Session object instance.
+ * @param[in] hCwmpEvent   - Handle to the CWMP event structure containing event code and command key.
+ * @param[in] bConnectNow  - Boolean flag indicating if immediate connection is required.
+ *                           TRUE = Connect to ACS immediately, FALSE = Queue event for next session.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS - Event added successfully.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPSESSO_ADD_EVENT)
     (
@@ -234,6 +459,19 @@ typedef  ANSC_STATUS
         BOOL                        bConnectNow
     );
 
+/**
+ * @brief Discard a specific CWMP event from the session's event queue.
+ *
+ * This function pointer typedef defines the callback interface for removing a specific event
+ * from the session's event queue by event code.
+ *
+ * @param[in] hThisObject - Handle to the CWMP Session object instance.
+ * @param[in] EventCode   - Event code to discard.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS - Event discarded successfully.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPSESSO_DISCARD_EVENT)
     (
@@ -241,18 +479,63 @@ typedef  ANSC_STATUS
         int                         EventCode
     );
 
+/**
+ * @brief Save the session's events to persistent storage.
+ *
+ * This function pointer typedef defines the callback interface for persisting queued events
+ * to non-volatile storage. This ensures events are not lost across reboots or power failures
+ * and will be redelivered when the CPE next connects to the ACS.
+ *
+ * @param[in] hThisObject - Handle to the CWMP Session object instance.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS - Events saved successfully.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPSESSO_SAVE_EVENT)
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/**
+ * @brief Delete all items from a session queue.
+ *
+ * This function pointer typedef defines the callback interface for deleting all items from
+ * a session queue. Used by DelAllEvents (clears event queue) and DelAllParameters (clears
+ * modified parameter queue).
+ *
+ * @param[in] hThisObject - Handle to the CWMP Session object instance.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS - All items deleted successfully.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPSESSO_DEL_ALL)
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/**
+ * @brief Add a modified parameter to the session's parameter queue.
+ *
+ * This function pointer typedef defines the callback interface for adding a parameter that has
+ * changed value to the session's modified parameter array.
+ *
+ * @param[in] hThisObject   - Handle to the CWMP Session object instance.
+ * @param[in] pParamName    - Parameter name that was modified.
+ * @param[in] pParamValue   - New value of the parameter as a string.
+ * @param[in] CwmpDataType  - CWMP data type of the parameter.
+ * @param[in] bConnectNow   - Boolean flag indicating if immediate connection is required.
+ *                            TRUE = Connect to ACS immediately, FALSE = Queue parameter for next session.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS - Modified parameter added successfully.
+ * @retval ANSC_STATUS_RESOURCES - Failed due to resource constraint.
+ * @retval ANSC_STATUS_FAILURE - Failed to added modified parameter.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPSESSO_ADD_PARAM)
     (
@@ -263,6 +546,20 @@ typedef  ANSC_STATUS
         BOOL                        bConnectNow
     );
 
+/**
+ * @brief Get the list of RPC methods supported by the CPE.
+ *
+ * This function pointer typedef defines the callback interface for retrieving the list of
+ * RPC methods supported by the CPE.
+ *
+ * @param[in]  hThisObject   - Handle to the CWMP Session object instance.
+ * @param[out] ppMethodList  - Pointer to receive the SLAP string array containing supported method names.
+ * @param[out] pulErrorCode  - Pointer to receive the error code if the operation fails.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS - Method list retrieved successfully.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPSESSO_GET_METHODS)
     (
@@ -271,6 +568,20 @@ typedef  ANSC_STATUS
         PULONG                      pulErrorCode
     );
 
+/**
+ * @brief Send an Inform RPC to the ACS.
+ *
+ * This function pointer typedef defines the callback interface for sending an Inform RPC to
+ * the ACS. The Inform method initiates every TR-069 session and reports device status, events,
+ * parameter changes, and device capabilities.
+ *
+ * @param[in]  hThisObject  - Handle to the CWMP Session object instance.
+ * @param[out] pulErrorCode - Pointer to receive the error code if the Inform operation fails.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS - Inform RPC sent successfully and response received.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPSESSO_INFORM)
     (
@@ -278,6 +589,28 @@ typedef  ANSC_STATUS
         PULONG                      pulErrorCode
     );
 
+/**
+ * @brief Send a TransferComplete RPC to the ACS.
+ *
+ * This function pointer typedef defines the callback interface for sending a TransferComplete
+ * RPC to notify the ACS that a file transfer (Download or Upload) has completed.
+ *
+ * @param[in]  hThisObject   - Handle to the CWMP Session object instance.
+ * @param[in]  bIsDownload   - Boolean flag indicating transfer direction.
+ *                             TRUE = Download completion, FALSE = Upload completion.
+ * @param[in]  pCommandKey   - CommandKey argument passed to CPE in the Download or Upload method call that initiated the transfer.
+ * @param[in]  hFault        - Handle to fault structure if transfer failed, or NULL on success.
+ *                             Non-zero FaultCode indicates transfer failure.
+ * @param[in]  hStartTime    - Handle to start time structure (date and time transfer was started in UTC).
+ * @param[in]  hCompleteTime - Handle to completion time structure (date and time transfer completed in UTC).
+ * @param[out] pulErrorCode  - Pointer to receive the error code if the operation fails.
+ * @param[in]  bAddEventCode - Boolean flag indicating if event code shall be added into session.
+ *                             TRUE = Add event, FALSE = Skip event addition.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS - TransferComplete RPC sent successfully.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPSESSO_TRANSFER_COMP)
     (
@@ -291,6 +624,32 @@ typedef  ANSC_STATUS
         BOOL                        bAddEventCode       /* if event code(s) shall be added into session */
     );
 
+/**
+ * @brief Send an AutonomousTransferComplete RPC to the ACS.
+ *
+ * This function pointer typedef defines the callback interface for sending an AutonomousTransferComplete
+ * RPC to the ACS. This informs the ACS of autonomous file transfers (downloads or uploads) initiated
+ * by the CPE without explicit ACS instruction.
+ *
+ * @param[in]  hThisObject     - Handle to the CWMP Session object instance.
+ * @param[in]  bIsDownload     - Boolean flag indicating transfer direction.
+ *                               TRUE = Autonomous download, FALSE = Autonomous upload.
+ * @param[in]  hFault          - Handle to fault structure if transfer failed, or NULL on success.
+ * @param[in]  hStartTime      - Handle to start time structure (date and time transfer was started in UTC).
+ * @param[in]  hCompleteTime   - Handle to completion time structure (date and time transfer completed in UTC).
+ * @param[in]  AnnounceURL     - Announce URL where CPE discovered the file.
+ * @param[in]  TransferURL     - Actual URL from which file was transferred.
+ * @param[in]  FileType        - File type identifier.
+ * @param[in]  FileSize        - Size of transferred file in bytes.
+ * @param[in]  TargetFileName  - Target filename on CPE filesystem.
+ * @param[out] pulErrorCode    - Pointer to receive the error code if the operation fails.
+ * @param[in]  bAddEventCode   - Boolean flag indicating if event code shall be added into session.
+ *                               TRUE = Add event, FALSE = Skip event addition (when PA tries to redeliver this RPC).
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS - AutonomousTransferComplete RPC sent successfully.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPSESSO_AT_TRANSFER_COMP)
     (
@@ -308,6 +667,22 @@ typedef  ANSC_STATUS
         BOOL                        bAddEventCode       /* if event code(s) shall be added into session */
     );
 
+/**
+ * @brief Send a DUStateChangeComplete RPC to the ACS.
+ *
+ * This function pointer typedef defines the callback interface for sending a DUStateChangeComplete
+ * RPC to notify the ACS of Deployment Unit (DU) state change completion.
+ *
+ * @param[in]  hThisObject   - Handle to the CWMP Session object instance.
+ * @param[in]  hDsccReq      - Handle to DU State Change Complete request structure.
+ * @param[out] pulErrorCode  - Pointer to receive the error code if the operation fails.
+ * @param[in]  bAddEventCode - Boolean flag indicating if event code shall be added into session.
+ *                             TRUE = Add event, FALSE = Skip event addition.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS - DUStateChangeComplete RPC sent successfully.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPSESSO_DUSC_COMP)
     (
@@ -317,6 +692,22 @@ typedef  ANSC_STATUS
         BOOL                        bAddEventCode       /* if event code(s) shall be added into session */
     );
 
+/**
+ * @brief Send an AutonomousDUStateChangeComplete RPC to the ACS.
+ *
+ * This function pointer typedef defines the callback interface for sending an AutonomousDUStateChangeComplete
+ * RPC to notify the ACS of autonomous Deployment Unit (DU) state changes.
+ *
+ * @param[in]  hThisObject   - Handle to the CWMP Session object instance.
+ * @param[in]  hAdsccReq     - Handle to Autonomous DU State Change Complete request structure.
+ * @param[out] pulErrorCode  - Pointer to receive the error code if the operation fails.
+ * @param[in]  bAddEventCode - Boolean flag indicating if event code shall be added into session.
+ *                             TRUE = Add event, FALSE = Skip event addition.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS - AutonomousDUStateChangeComplete RPC sent successfully.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPSESSO_AT_DUSC_COMP)
     (
@@ -326,6 +717,30 @@ typedef  ANSC_STATUS
         BOOL                        bAddEventCode       /* if event code(s) shall be added into session */
     );
 
+/**
+ * @brief Send a Kicked RPC to the ACS.
+ *
+ * This function pointer typedef defines the callback interface for sending a Kicked RPC to the ACS.
+ * This notification is sent when the CPE has been "kicked" off its current session by another entity
+ * attempting to establish a connection request.
+ *
+ * @param[in]  hThisObject - Handle to the CWMP Session object instance.
+ * @param[in]  pCommand    - Command string that initiated the kick operation. Specifies a generic argument
+ *                           that may be used by the server for identification or other purposes.
+ * @param[in]  pReferer    - Referer string identifying the source of the kick request. Specifies the content
+ *                           of the "Referer" HTTP header sent to the CPE when it was kicked.
+ * @param[in]  pArg        - Argument string with additional kick operation parameters. Specifies a generic argument
+ *                           that may be used by the server for identification or other purposes.
+ * @param[in]  pNext       - Next action string indicating what should follow the kick. Specifies the URL the server
+ *                           should return in the method response under normal conditions.
+ * @param[out] ppNextUrl   - Pointer to receive the next URL string for session continuation, or NULL.
+ *                           Returns the next URL the user's browser should be redirected to.
+ * @param[out] pulErrorCode - Pointer to receive the error code if the operation fails.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS - Kicked RPC sent successfully.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPSESSO_KICKED)
     (
@@ -338,6 +753,24 @@ typedef  ANSC_STATUS
         PULONG                      pulErrorCode
     );
 
+/**
+ * @brief Send a RequestDownload RPC to the ACS.
+ *
+ * This function pointer typedef defines the callback interface for sending a RequestDownload
+ * RPC to request the ACS initiate a file download to the CPE.
+ *
+ * @param[in]  hThisObject         - Handle to the CWMP Session object instance.
+ * @param[in]  pFileType           - File type string identifier.
+ * @param[in]  hFileTypeArgArray   - Handle to array of file type argument structures, or NULL if none. Specifies the array
+ *                                   of zero or more additional arguments, where each argument is a structure of name-value pairs.
+ * @param[in]  ulArraySize         - Size of the file type argument array. Specifies the number of name-value
+ *                                   pairs in the 'hFileTypeArgArray' argument.
+ * @param[out] pulErrorCode        - Pointer to receive the error code if the operation fails.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS - RequestDownload RPC sent successfully.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPSESSO_REQ_DOWNLOAD)
     (
@@ -348,6 +781,19 @@ typedef  ANSC_STATUS
         PULONG                      pulErrorCode
     );
 
+/**
+ * @brief Receive and process a SOAP message from the ACS.
+ *
+ * This function pointer typedef defines the callback interface for receiving and processing SOAP
+ * messages from the ACS connection.
+ *
+ * @param[in] hThisObject - Handle to the CWMP Session object instance.
+ * @param[in] pMessage    - SOAP message string received from the ACS. Must be a valid XML SOAP envelope.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS - SOAP message processed successfully.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPSESSO_RECV)
     (
@@ -355,24 +801,78 @@ typedef  ANSC_STATUS
         char*                       pMessage
     );
 
+/**
+ * @brief Notify that the CWMP session has closed.
+ *
+ * This function pointer typedef defines the callback interface for notifying the CPE Controller
+ * that the CWMP session with the ACS has been closed.
+ *
+ * @param[in] hThisObject - Handle to the CWMP Session object instance.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS - Session closed notification completed successfully.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPSESSO_NOTIFY)
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/**
+ * @brief Asynchronously process CWMP session tasks.
+ *
+ * This function pointer typedef defines the callback interface for asynchronous processing of
+ * CWMP session tasks in a separate thread. This task is created to stream-line SOAP requests and responses
+ * and construct SOAP messages sent to the ACS.
+ *
+ * @param[in] hThisObject - Handle to the CWMP Session object instance.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS - Async processing task completed successfully.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPSESSO_ASYNC_PROCESS)
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/**
+ * @brief Perform session timer action operations.
+ *
+ * This function pointer typedef defines the callback interface for performing timer-related
+ * actions on the CWMP session. Actions include StartRetryTimer (schedule session retry after failure),
+ * StopRetryTimer (cancel pending retry), and StopDelayedActiveNotifTimer (cancel delayed active
+ * notification timer). Used for managing session timing behavior and retry logic.
+ *
+ * @param[in] hThisObject - Handle to the CWMP Session object instance.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS - Timer action completed successfully.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPSESSO_ACTION)
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/**
+ * @brief Cancel the session retry delay timer.
+ *
+ * This function pointer typedef defines the callback interface for canceling the retry delay timer
+ * and optionally initiating an immediate connection to the ACS. Used when external events require
+ * immediate session establishment instead of waiting for the scheduled retry interval.
+ *
+ * @param[in] hThisObject   - Handle to the CWMP Session object instance.
+ * @param[in] bConnectAgain - Boolean flag indicating whether to connect immediately after canceling retry.
+ *                            TRUE = Connect to ACS immediately, FALSE = Only cancel retry timer.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS - Retry delay canceled successfully.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPSESSO_CANCEL_RETRY)
     (
@@ -380,6 +880,20 @@ typedef  ANSC_STATUS
         BOOL                        bConnectAgain
     );
 
+/**
+ * @brief Check if an Inform RPC is pending.
+ *
+ * This function pointer typedef defines the callback interface for checking whether an Inform RPC
+ * is pending for transmission to the ACS. Used to check if the session has to send inform immediately,
+ * probably due to an event has been generated.
+ *
+ * @param[in] hThisObject - Handle to the CWMP Session object instance.
+ *
+ * @return Boolean indicating if Inform is pending.
+ * @retval TRUE  - Inform RPC is pending, session should be initiated.
+ * @retval FALSE - No Inform pending, no immediate session required.
+ *
+ */
 typedef  BOOL
 (*PFN_CWMPSESSO_INF_PENDING)
     (

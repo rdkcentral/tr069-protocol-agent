@@ -19,13 +19,13 @@
 
 /**********************************************************************
    Copyright [2014] [Cisco Systems, Inc.]
- 
+
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
- 
+
        http://www.apache.org/licenses/LICENSE-2.0
- 
+
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -56,7 +56,7 @@
 
     author:
 
-        Hui Ma 
+        Hui Ma
 
     ---------------------------------------------------------------
 
@@ -106,18 +106,36 @@
 #define CCSP_SUPPORTED_DATA_MODEL_PARAMETER_VALUE_LENGTH          1000
 
 #define SupportedDataModelURLID             0
-#define SupportedDataModelURNID             1             
-#define SupportedDataModelFeaturesID        2          
+#define SupportedDataModelURNID             1
+#define SupportedDataModelFeaturesID        2
 
-/* Called by init function to fill in parameter values from config file.
- */
+
+/**
+* @brief Fill in Supported Data Model object information from XML configuration file.
+*
+* This function initializes the Device.DeviceInfo.SupportedDataModel object hierarchy by parsing the XML configuration
+* file (sdm.xml) and populating the objectInfo array parameters for each supported data model instance.
+* Called by init function to fill in parameter values from config file.
+*
+* @return None.
+*
+*/
 CCSP_VOID CcspManagementServer_FillInSDMObjectInfo();
 
 
-/* CcspManagementServer_GetSupportedDataModel_URL is called to get
- * Device.DeviceInfo.SupportedDataModel.URL.
- * Return value - the parameter value.
- */
+
+/**
+* @brief Get the URL parameter of a Supported Data Model instance.
+*
+* This function retrieves the Device.DeviceInfo.SupportedDataModel.{i}.URL parameter
+* value, which contains the URL reference to the data model specification document.
+*
+* @param[in] ComponentName  - CCSP component name.
+* @param[in] ObjectID  - Object identifier for the specific SupportedDataModel instance.
+*
+* @return Pointer to newly allocated string containing the URL parameter value.
+*
+*/
 CCSP_STRING
 CcspManagementServer_GetSupportedDataModel_URL
     (
@@ -125,10 +143,18 @@ CcspManagementServer_GetSupportedDataModel_URL
         int                         ObjectID
     );
 
-/* CcspManagementServer_GetSupportedDataModel_URN is called to get
- * Device.DeviceInfo.SupportedDataModel.URN.
- * Return value - the parameter value.
- */
+
+/**
+* @brief Get the URN parameter of a Supported Data Model instance.
+*
+* This function retrieves the Device.DeviceInfo.SupportedDataModel.{i}.URN parameter value.
+*
+* @param[in] ComponentName  - CCSP component name.
+* @param[in] ObjectID  - Object identifier for the specific SupportedDataModel instance.
+*
+* @return Pointer to newly allocated string containing the URN parameter value.
+*
+*/
 CCSP_STRING
 CcspManagementServer_GetSupportedDataModel_URN
     (
@@ -136,10 +162,19 @@ CcspManagementServer_GetSupportedDataModel_URN
         int                         ObjectID
     );
 
-/* CcspManagementServer_GetSupportedDataModel_Features is called to get
- * Device.DeviceInfo.SupportedDataModel.Features.
- * Return value - the parameter value.
- */
+
+/**
+* @brief Get the Features parameter of a Supported Data Model instance.
+*
+* This function retrieves the Device.DeviceInfo.SupportedDataModel.{i}.Features parameter
+* value, which contains a list of supported optional features for the data model.
+*
+* @param[in] ComponentName  - CCSP component name.
+* @param[in] ObjectID  - Object identifier for the specific SupportedDataModel instance.
+*
+* @return Pointer to newly allocated string containing the Features parameter value.
+*
+*/
 CCSP_STRING
 CcspManagementServer_GetSupportedDataModel_Features
     (

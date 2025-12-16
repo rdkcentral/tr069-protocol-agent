@@ -79,6 +79,18 @@
         FUNCTIONS IMPLEMENTED IN CCSP_CWMP_HCO_INTERFACE.C
 ***********************************************************/
 
+/**
+* @brief Create a new CCSP CWMP Helper Container object.
+*
+* This function creates and initializes a new CCSP CWMP Helper Container object.
+*
+* @param[in] hContainerContext  - Container context handle.
+* @param[in] hOwnerContext  - Owner context handle.
+* @param[in] hAnscReserved  - Reserved context handle.
+*
+* @return Handle of the newly created Helper Container object.
+*
+*/
 ANSC_HANDLE
 CcspCwmpCreateHelperContainer
     (
@@ -92,6 +104,21 @@ CcspCwmpCreateHelperContainer
            FUNCTIONS IMPLEMENTED IN CCSP_CWMP_HCO_BASE.C
 ***********************************************************/
 
+/**
+* @brief Construct the CCSP CWMP Helper Container object.
+*
+* This function constructs the Helper Container object, allocates memory, and initializes
+* member variables and functions.
+*
+* @param[in] hContainerContext  - Container context handle.
+* @param[in] hOwnerContext  - Owner context handle.
+* @param[in] hAnscReserved  - Reserved context handle.
+*
+* @return Handle of the newly created container object, or NULL if allocation fails.
+* @retval Handle of the newly created container object on success.
+* @retval NULL if allocation fails.
+*
+*/
 ANSC_HANDLE
 CcspCwmpHcoCreate
     (
@@ -100,18 +127,53 @@ CcspCwmpHcoCreate
         ANSC_HANDLE                 hAnscReserved
     );
 
+/**
+* @brief Destroy the CCSP CWMP Helper Container object.
+*
+* This function destroys the Helper Container object and releasing all allocated memory resources.
+*
+* @param[in] hThisObject  - Handle to the Helper Container object to destroy.
+*
+* @return The status of the operation.
+* @retval ANSC_STATUS_SUCCESS if the object is destroyed successfully.
+*
+*/
 ANSC_STATUS
 CcspCwmpHcoRemove
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/**
+* @brief Enroll all objects required by the Helper Container.
+*
+* This function enrolls all dependent utility objects and helper services required
+* by the Helper Container for supporting TR-069 protocol operations.
+*
+* @param[in] hThisObject  - Handle to the Helper Container object.
+*
+* @return The status of the operation.
+* @retval ANSC_STATUS_SUCCESS if all objects enrolled successfully.
+*
+*/
 ANSC_STATUS
 CcspCwmpHcoEnrollObjects
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/**
+* @brief Initialize the CCSP CWMP Helper Container object.
+*
+* This function initializes the Helper Container object by calling the base class initializer
+* and setting up object-specific fields and TR-069 interfaces.
+*
+* @param[in] hThisObject  - Handle to the Helper Container object.
+*
+* @return The status of the operation.
+* @retval ANSC_STATUS_SUCCESS if initialization is successful.
+*
+*/
 ANSC_STATUS
 CcspCwmpHcoInitialize
     (

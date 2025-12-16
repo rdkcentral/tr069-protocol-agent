@@ -19,13 +19,13 @@
 
 /**********************************************************************
    Copyright [2014] [Cisco Systems, Inc.]
- 
+
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
- 
+
        http://www.apache.org/licenses/LICENSE-2.0
- 
+
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,7 +38,7 @@
 
     module: ccsp_tr069pa_wrapper_api.h
 
-        For CCSP TR-069 Protocol Agent 
+        For CCSP TR-069 Protocol Agent
 
     ---------------------------------------------------------------
 
@@ -119,7 +119,7 @@ extern char *g_Tr069_PA_Name;
  * SAFECLIB Erro Handling Logging APIs
  */
 #define RDK_SAFECLIB_ERR()  printf("safeclib error at %s %s:%d\n", __FILE__, __FUNCTION__, __LINE__)
- 
+
 #define ERR_CHK(rc)                                             \
     if((long)rc !=EOK) {                                              \
         RDK_SAFECLIB_ERR();                                     \
@@ -141,10 +141,44 @@ typedef int errno_t;
 #define memset_s(dst,max_1,c,max) EOK; \
  memset(dst,c,max);
 
+/**
+ * @brief Safe string comparison function.
+ *
+ * This function provides a safe string comparison implementation for platforms that cannot
+ * include the full SAFECLIB library due to image size constraints. It compares
+ * two strings and returns the result through an indicator pointer. This is a dummy/stub
+ * implementation used when SAFEC_DUMMY_API is defined.
+ *
+ * @param[in] s1      First string to compare.
+ * @param[in] m1      Maximum length of first string.
+ * @param[in] s2      Second string to compare.
+ * @param[out] indicator  Pointer to receive comparison result.
+ *                        [Values: 0 if strings are equal, non-zero if different].
+ *
+ * @return Error code indicating operation status.
+ * @retval EOK  Operation completed successfully.
+ * @retval -1   Operation failed.
+ */
 errno_t strcmp_s(const char *,int,const char *,int *);
+/**
+ * @brief Safe case-insensitive string comparison function.
+ *
+ * This function provides a safe case-insensitive string comparison implementation for platforms
+ * that cannot include the full SAFECLIB library due to image size constraints.
+ * It compares two strings ignoring case differences and returns the result through an indicator
+ * pointer. This is a dummy/stub implementation used when SAFEC_DUMMY_API is defined.
+ *
+ * @param[in] s1      First string to compare.
+ * @param[in] m1      Maximum length of first string.
+ * @param[in] s2      Second string to compare.
+ * @param[out] indicator  Pointer to receive comparison result.
+ *                        [Values: 0 if strings are equal, non-zero if different].
+ *
+ * @return Error code indicating operation status.
+ * @retval EOK  Operation completed successfully.
+ * @retval -1   Operation failed.
+ */
 errno_t strcasecmp_s(const char * ,int , const char * ,int *);
 #endif
 
 #endif
-
-
