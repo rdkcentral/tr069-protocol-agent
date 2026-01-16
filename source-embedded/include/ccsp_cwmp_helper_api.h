@@ -19,13 +19,13 @@
 
 /**********************************************************************
    Copyright [2014] [Cisco Systems, Inc.]
- 
+
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
- 
+
        http://www.apache.org/licenses/LICENSE-2.0
- 
+
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -84,11 +84,36 @@
 #define  CCSP_TR069PA_PARAM_NOTIF_ATTR              "PmNotif"
 
 
+/**
+ * @brief Set SOAP fault structure based on CWMP fault code.
+ *
+ * This inline function populates a CCSP_CWMP_SOAP_FAULT structure with appropriate
+ * SOAP and CWMP fault codes and strings corresponding to the provided fault code.
+ * It maps CWMP protocol fault codes to their standard SOAP fault representations.
+ *
+ * @param[out] pCwmpSoapFault  Pointer to CCSP_CWMP_SOAP_FAULT structure to be populated.
+ *                              Must be a valid, allocated structure.
+ * @param[in]  faultCode       CWMP fault code to convert. Valid values include:
+ *                              - CCSP_CWMP_CPE_CWMP_FaultCode_methodUnsupported (9000)
+ *                              - CCSP_CWMP_CPE_CWMP_FaultCode_requestDenied (9001)
+ *                              - CCSP_CWMP_CPE_CWMP_FaultCode_internalError (9002)
+ *                              - CCSP_CWMP_CPE_CWMP_FaultCode_invalidArgs (9003)
+ *                              - CCSP_CWMP_CPE_CWMP_FaultCode_resources (9004)
+ *                              - CCSP_CWMP_CPE_CWMP_FaultCode_invalidParamName (9005)
+ *                              - CCSP_CWMP_CPE_CWMP_FaultCode_invalidParamType (9006)
+ *                              - CCSP_CWMP_CPE_CWMP_FaultCode_invalidParamValue (9007)
+ *                              - CCSP_CWMP_CPE_CWMP_FaultCode_notWritable (9008)
+ *                              - CCSP_CWMP_CPE_CWMP_FaultCode_notifyRejected (9009)
+ *                              - And other CWMP-defined fault codes (9010-9026)
+ *
+ * @return None.
+ *
+ */
 __inline static
-void 
+void
 CCSP_CWMP_SET_SOAP_FAULT
     (
-        PCCSP_CWMP_SOAP_FAULT       pCwmpSoapFault, 
+        PCCSP_CWMP_SOAP_FAULT       pCwmpSoapFault,
         ULONG                       faultCode
     )
 {
@@ -412,8 +437,25 @@ CCSP_CWMP_SET_SOAP_FAULT
 }
 
 
+/**
+ * @brief Free memory allocated for a string array.
+ *
+ * This inline function releases memory allocated for an array of strings.
+ * It can optionally free individual string elements and/or the array itself.
+ *
+ * @param[in,out] pStringArray      Pointer to array of string pointers to free.
+ *                                   Each element is freed if non-NULL.
+ * @param[in]     ulArraySize        Number of elements in the string array.
+ *                                   Valid range: 0 to maximum array size.
+ * @param[in]     bFreeArrayAsWell   Flag indicating whether to free the array pointer itself.
+ *                                   - TRUE: Free both individual strings and the array
+ *                                   - FALSE: Free only individual strings, keep array
+ *
+ * @return None.
+ *
+ */
 __inline static
-void 
+void
 CcspTr069FreeStringArray
     (
         char**                      pStringArray,
@@ -465,6 +507,22 @@ CCSP_TR069PA_PARAM_ATTR_SLIST_ENTRY, *PCCSP_TR069PA_PARAM_ATTR_SLIST_ENTRY;
 
 #define ACCESS_CCSP_TR069PA_PARAM_ATTR_SLIST_ENTRY(p) ACCESS_CONTAINER(p, CCSP_TR069PA_PARAM_ATTR_SLIST_ENTRY, Linkage)
 
+/**
+ * @brief Free all string entries in a queue.
+ *
+ * This inline function removes and frees all CCSP_TR069PA_STRING_SLIST_ENTRY
+ * elements from a queue. It can optionally free the string values contained
+ * within each entry.
+ *
+ * @param[in,out] pQueueHeader  Pointer to queue header containing string entries.
+ *                               All entries are removed and freed.
+ * @param[in]     bFreeValue    Flag indicating whether to free the string values.
+ *                               - TRUE: Free both entry structures and string values
+ *                               - FALSE: Free only entry structures, preserve values
+ *
+ * @return None.
+ *
+ */
 inline static
 void
 CcspTr069FreeStringQueue(PQUEUE_HEADER pQueueHeader, BOOL bFreeValue)
@@ -485,6 +543,18 @@ CcspTr069FreeStringQueue(PQUEUE_HEADER pQueueHeader, BOOL bFreeValue)
     }
 }
 
+/**
+ * @brief Free all parameter attribute entries in a queue.
+ *
+ * This inline function removes and frees all CCSP_TR069PA_PARAM_ATTR_SLIST_ENTRY
+ * elements from a queue, including the parameter attribute structures they contain.
+ *
+ * @param[in,out] pQueueHeader  Pointer to queue header containing parameter attribute entries.
+ *                               All entries and their ParamAttr structures are freed.
+ *
+ * @return None.
+ *
+ */
 inline static
 void
 CcspTr069FreeParamAttrQueue(PQUEUE_HEADER pQueueHeader)
@@ -500,6 +570,22 @@ CcspTr069FreeParamAttrQueue(PQUEUE_HEADER pQueueHeader)
     }
 }
 
+/**
+ * @brief Free all string entries in a single-linked list.
+ *
+ * This inline function removes and frees all CCSP_TR069PA_STRING_SLIST_ENTRY
+ * elements from a single-linked list. It can optionally free the string values
+ * contained within each entry.
+ *
+ * @param[in,out] pSListHeader  Pointer to single-linked list header containing string entries.
+ *                               All entries are removed and freed.
+ * @param[in]     bFreeValue    Flag indicating whether to free the string values.
+ *                               - TRUE: Free both entry structures and string values
+ *                               - FALSE: Free only entry structures, preserve values
+ *
+ * @return None.
+ *
+ */
 inline static
 void
 CcspTr069FreeStringSList(PSLIST_HEADER pSListHeader, BOOL bFreeValue)
@@ -566,7 +652,23 @@ CCSP_TR069PA_NSLIST, *PCCSP_TR069PA_NSLIST;
  * This feature can be turned off if there's no such problems in future.
  */
 #ifndef  _NO_CCSP_TR069PA_GPN_RESULT_FILTERING
-__inline static BOOL 
+/**
+ * @brief Check if a parameter name already exists in GPN (GetParameterNames) result queue.
+ *
+ * This inline function verifies whether a parameter name has already been added to
+ * the namespace list queue, preventing duplicate entries when multiple Functional
+ * Components return the same namespace. Used to filter GPN response results.
+ *
+ * @param[in] pNsListQueue  Pointer to queue header containing namespace list entries.
+ * @param[in] pParamName    Pointer to parameter name string to check for duplicates.
+ *                           NULL or empty string returns TRUE.
+ *
+ * @return Boolean indicating whether parameter name exists in queue.
+ * @retval TRUE if parameter name already exists in queue or pParamName is NULL/empty.
+ * @retval FALSE if parameter name does not exist in queue.
+ *
+ */
+__inline static BOOL
 CcspTr069PaIsGpnNsInQueue
     (
         PQUEUE_HEADER               pNsListQueue,
@@ -577,9 +679,9 @@ CcspTr069PaIsGpnNsInQueue
     PCCSP_TR069PA_NSLIST            pNsList;
     PCCSP_PARAM_NAME_INFO           pParamInfo;
 
-    if ( !pParamName || *pParamName == 0 ) return TRUE;   
- 
-    pSLinkEntry = AnscQueueGetFirstEntry(pNsListQueue);          
+    if ( !pParamName || *pParamName == 0 ) return TRUE;
+
+    pSLinkEntry = AnscQueueGetFirstEntry(pNsListQueue);
     while ( pSLinkEntry )
     {
         pNsList = ACCESS_CCSP_TR069PA_NSLIST(pSLinkEntry);
@@ -597,7 +699,6 @@ CcspTr069PaIsGpnNsInQueue
     return FALSE;
 }
 #endif
-
 
 #define  CcspTr069PaPushGpvNsInQueue(pNsListQueue, pParamName, pParamValue, ccspType, pNsList)          \
     do {                                                                                                \
@@ -742,6 +843,23 @@ CCSP_TR069PA_FC_NSLIST, *PCCSP_TR069PA_FC_NSLIST;
     } while (0)
 
 
+/**
+ * @brief Find a Functional Component namespace list entry in a queue.
+ *
+ * This inline function searches for a CCSP_TR069PA_FC_NSLIST entry in a queue
+ * that matches the specified subsystem and functional component name.
+ *
+ * @param[in] pFcNsListQueue  Pointer to queue header containing FC namespace list entries.
+ * @param[in] pSubSystem      Pointer to subsystem name string to match.
+ *                             NULL matches entries with NULL subsystem.
+ * @param[in] pFcName         Pointer to functional component name string to match.
+ *                             NULL matches entries with NULL FC name.
+ *
+ * @return Pointer to matching CCSP_TR069PA_FC_NSLIST entry.
+ * @retval PCCSP_TR069PA_FC_NSLIST pointer to matching entry if found.
+ * @retval NULL if no matching entry is found.
+ *
+ */
 __inline static PCCSP_TR069PA_FC_NSLIST
 CcspTr069PaFindFcNsList
     (
@@ -806,6 +924,22 @@ CcspTr069PaFindFcNsList
     } while (0)
 
 
+/**
+ * @brief Convert ISO 8601 date-time string to ANSC_UNIVERSAL_TIME structure.
+ *
+ * This inline function parses an ISO 8601 formatted date-time string and converts
+ * it into an ANSC_UNIVERSAL_TIME structure. Supports formats like \"2001-01-01\" and
+ * \"2005-09-28T18:20:41\" as recommended by RFC 3339 and W3C date/time formats.
+ *
+ * @param[in] calendar_time  Pointer to ISO 8601 formatted date-time string.
+ *                            Expected format: \"YYYY-MM-DDTHH:MM:SS\" or \"YYYY-MM-DD\".
+ *                            Must be a valid, null-terminated string.
+ *
+ * @return Pointer to newly allocated ANSC_UNIVERSAL_TIME structure.
+ * @retval PANSC_UNIVERSAL_TIME pointer to time structure with parsed fields.
+ * @retval NULL if memory allocation fails or parsing errors occur.
+ *
+ */
 __inline static
 PANSC_UNIVERSAL_TIME
 CcspStringToCalendarTime
@@ -930,6 +1064,21 @@ CcspStringToCalendarTime
 }
 
 
+/**
+ * @brief Convert ANSC_UNIVERSAL_TIME structure to ISO 8601 date-time string.
+ *
+ * This inline function converts an ANSC_UNIVERSAL_TIME structure into an
+ * ISO 8601 formatted date-time string with the format \"YYYY-MM-DDTHH:MM:SSZ\".
+ * The returned string is dynamically allocated and must be freed by the caller.
+ *
+ * @param[in] pUniversalTime  Pointer to ANSC_UNIVERSAL_TIME structure containing date/time values.
+ *                             Must contain valid Year, Month, DayOfMonth, Hour, Minute, Second fields.
+ *
+ * @return Pointer to newly allocated ISO 8601 formatted string.
+ * @retval char* pointer to formatted string on success.
+ * @retval NULL if memory allocation fails.
+ *
+ */
 __inline static
 char*
 CcspCalendarTimeToString
@@ -960,11 +1109,24 @@ CcspCalendarTimeToString
 }
 
 
-/*
- * CcspFindUnusedInsNumber finds first unused instance number
- * from 1.
+/**
+ * @brief Find first unused instance number from 1.
  *
- * Return value - instance number, 0 means failure.
+ * This inline function searches for the first available instance number that is
+ * not present in the provided array of existing instance numbers. Useful for
+ * allocating new TR-069 object instances.
+ *
+ * @param[in] NumInstances   Number of existing instance numbers in the array.
+ *                            Valid range: 0 to MaxInsNumber.
+ * @param[in] pInsNumbers    Pointer to array of existing instance numbers to check against.
+ *                            Can be NULL if NumInstances is 0.
+ * @param[in] MaxInsNumber   Maximum allowed instance number.
+ *                            Valid range: 1 to UINT_MAX.
+ *
+ * @return First available instance number.
+ * @retval unsigned int (1 to MaxInsNumber) for first unused instance number.
+ * @retval 0 if no unused instance number is available (NumInstances >= MaxInsNumber).
+ * @retval 1 if no instances exist (NumInstances == 0).
  */
 __inline static
 unsigned int
@@ -1013,6 +1175,30 @@ CcspFindUnusedInsNumber
 }
 
 
+/**
+ * @brief Search for a pattern in a memory buffer.
+ *
+ * This inline function searches for a specified byte pattern within a memory buffer.
+ * Supports both case-sensitive and case-insensitive searches for ASCII characters.
+ * Used for parsing HTTP headers and other protocol messages.
+ *
+ * @param[in] pBuf            Pointer to memory buffer to search within.
+ *                             Must point to valid memory of at least ulSize bytes.
+ * @param[in] ulSize          Size of the memory buffer in bytes.
+ *                             Valid range: ulPatternLen to ULONG_MAX.
+ * @param[in] pPattern        Pointer to pattern to search for.
+ *                             Must point to valid memory of ulPatternLen bytes.
+ * @param[in] ulPatternLen    Length of the pattern in bytes.
+ *                             Valid range: 1 to ulSize.
+ * @param[in] bCaseSensitive  Flag indicating case sensitivity for ASCII characters.
+ *                             - TRUE: Perform case-sensitive search
+ *                             - FALSE: Perform case-insensitive search (ASCII only)
+ *
+ * @return Pointer to first occurrence of pattern in buffer.
+ * @retval char* pointer to start of pattern match within pBuf.
+ * @retval NULL if pattern is not found in buffer.
+ *
+ */
 __inline static
 char*
 CcspMemorySearch
@@ -1075,6 +1261,23 @@ CcspMemorySearch
 }
 
 
+/**
+ * @brief Prefix a PSM (Persistent Storage Manager) key with subsystem prefix.
+ *
+ * This inline function constructs a complete PSM key by prepending a subsystem
+ * prefix to a base PSM key. If no prefix is provided, the base key is copied
+ * unchanged. The caller must ensure the output buffer is large enough.
+ *
+ * @param[out] pPsmKeyWithPrefix  Pointer to output buffer for prefixed PSM key.
+ *                                 Must be pre-allocated with sufficient size.
+ * @param[in]  pSubsysPrefix      Pointer to subsystem prefix string to prepend.
+ *                                 NULL or empty string results in no prefix.
+ * @param[in]  psmKey              Pointer to base PSM key string.
+ *                                 Must be a valid, null-terminated string.
+ *
+ * @return None.
+ *
+ */
 __inline static
 void
 CcspCwmpPrefixPsmKey
@@ -1082,7 +1285,7 @@ CcspCwmpPrefixPsmKey
         char*                       pPsmKeyWithPrefix,
         char*                       pSubsysPrefix,
         char*                       psmKey
-        
+
     )
 {
     /* we don't check buffer size, caller should make sure the buffer is big enough */
@@ -1099,4 +1302,3 @@ CcspCwmpPrefixPsmKey
 
 
 #endif
-

@@ -19,13 +19,13 @@
 
 /**********************************************************************
    Copyright [2014] [Cisco Systems, Inc.]
- 
+
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
- 
+
        http://www.apache.org/licenses/LICENSE-2.0
- 
+
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -56,7 +56,7 @@
 
     author:
 
-        Hui Ma 
+        Hui Ma
 
     ---------------------------------------------------------------
 
@@ -189,9 +189,9 @@ enum
 #define AutonomousTransferCompletePolicyNumOfParameters         4
 
 #define DUStateChangeComplPolicyEnableID                0
-#define DUStateChangeComplPolicyOperationTypeFilterID   1             
-#define DUStateChangeComplPolicyResultTypeFilterID      2          
-#define DUStateChangeComplPolicyFaultCodeFilterID       3         
+#define DUStateChangeComplPolicyOperationTypeFilterID   1
+#define DUStateChangeComplPolicyResultTypeFilterID      2
+#define DUStateChangeComplPolicyFaultCodeFilterID       3
 #define DUStateChangeComplPolicyNumOfParameters         4
 
 #define Tr069paNameID           0
@@ -239,30 +239,141 @@ typedef struct _msParameterValSettingArray
     msParameterValSetting *         msParameterValSettings;
 } msParameterValSettingArray;
 
-/* Called by init function to fill in parameter values from PSM.
- */
+/**
+* @brief Called by init function to Fill in object information from persistent storage.
+*
+* This function initializes the object information structure with default values
+* and reads parameter values from PSM. It sets up the data model hierarchy
+* for ManagementServer and internal objects.
+*
+* @return None.
+*
+*/
 CCSP_VOID CcspManagementServer_FillInObjectInfo();
+
+/**
+* @brief Initialize DBus connection for Management Server.
+*
+* This function initializes the DBus message bus connection for the Management Server component.
+*
+* @return None.
+*
+*/
 CCSP_VOID CcspManagementServer_InitDBus();
+
+/**
+* @brief Register the Management Server namespace with the system.
+*
+* This function registers the data model namespace that the Management Server
+* component provides, enabling other components to access its parameters.
+*
+* @return The status of the operation.
+* @retval ANSC_STATUS_SUCCESS if registration is successful.
+*
+*/
 ANSC_STATUS CcspManagementServer_RegisterNameSpace();
+
+/**
+* @brief Discover PAM component information.
+*
+* This function discovers the PAM component's name and path for inter-component communication.
+*
+* @return The status of the operation.
+* @retval ANSC_STATUS_SUCCESS if discovery is successful.
+*
+*/
 ANSC_STATUS CcspManagementServer_DiscoverComponent();
+
+/**
+* @brief Register WAN interface for communication.
+*
+* This function registers the WAN interface that will be used for with the ACS server.
+*
+* @return The status of the operation.
+* @retval ANSC_STATUS_SUCCESS if registration is successful.
+*
+*/
 ANSC_STATUS CcspManagementServer_RegisterWanInterface();
+
+/**
+* @brief Generate the Connection Request URL.
+*
+* This function generates the Connection Request URL that the ACS uses to initiate
+* connections to the CPE.
+*
+* @param[in] fromValueChangeSignal  - Boolean indicating if called from value change signal.
+*                                     TRUE if triggered by parameter value change, FALSE otherwise.
+* @param[in] newValue  - New value string when triggered by value change, or NULL.
+*
+* @return The status of the operation.
+* @retval ANSC_STATUS_SUCCESS if URL generation is successful.
+* @retval ANSC_STATUS_FAILURE if URL generation fails.
+*
+*/
 ANSC_STATUS CcspManagementServer_GenerateConnectionRequestURL(
     BOOL fromValueChangeSignal,
     char *newValue);
+
+/**
+* @brief Send parameter value change signal.
+*
+* This function sends a signal to notify other components when a parameter
+* value has changed. Used for active notification and value change tracking.
+*
+* @param[in] objectID  - Object identifier containing the parameter.
+* @param[in] parameterID  - Parameter identifier that changed.
+* @param[in] oldValue  - Previous value of the parameter before change.
+*
+* @return The status of the operation.
+* @retval 0 if signal sent successfully.
+*
+*/
 int SendValueChangeSignal(
-    int objectID, 
+    int objectID,
     int parameterID,
     const char * oldValue);
 
+/**
+* @brief Get value of a single parameter.
+*
+* This function retrieves the current value of a specified parameter
+* and populates the provided parameterValStruct_t structure.
+*
+* @param[in] objectID  - Object identifier containing the parameter.
+* @param[in] parameterID  - Parameter identifier to retrieve.
+* @param[out] val  - Pointer to parameterValStruct_t to populate with parameter value.
+*
+* @return None.
+*
+*/
 void CcspManagementServer_GetSingleParameterValue(
         int objectID,
         int parameterID,
         parameterValStruct_t *val
     );
 
-/* CcspManagementServer_ValidateParameterValues is called to validate
- * prameters that are sent for updating.
- */
+
+/**
+* @brief Validate parameter values before commit.
+*
+* This function validates all parameter values that are being updated before commit.
+*
+* @param[in] sessionId  - Session identifier for the validation operation.
+* @param[in] writeID  - Write operation identifier for tracking changes.
+* @param[in] val  - Array of parameterValStruct_t structures containing values to validate.
+* @param[in] size  - Number of parameters in the val array.
+* @param[out] invalidParameterName  - Pointer to store the name of first invalid parameter if validation fails.
+*
+* @return The validation result.
+* @retval 0 if all parameters are valid.
+* @retval TR69_INVALID_PARAMETER_NAME if parameter name is invalid.
+* @retval TR69_INVALID_PARAMETER_TYPE if parameter type is invalid.
+* @retval TR69_INVALID_PARAMETER_VALUE if parameter value is invalid.
+* @retval TR69_INVALID_ARGUMENTS if argument is invalid
+* @retval TR69_UPDATE_NON_WRITABLE_PARAMETER if parameter is not writable.
+* @retval TR69_INTERNAL_ERROR if internal error occurs or having insufficient resources.
+*
+*/
 int CcspManagementServer_ValidateParameterValues(
     int sessionId,
     unsigned int writeID,
@@ -271,13 +382,34 @@ int CcspManagementServer_ValidateParameterValues(
     char ** invalidParameterName
     );
 
-/* Get the number of all parameters of this object and its children.
+
+/**
+* @brief Get the number of all parameters of this object and its children.
+*
+* This function recursively counts all parameters in an object and its child objects in the hierarchy.
+*
+* @param[in] objectID  - Root object identifier to count from.
+*
+* @return The number of parameters.
+*
 */
 int CcspManagementServer_GetParameterCount(
     int objectID
     );
 
-/* Set single parameter value.
+
+/**
+* @brief Set value of a single parameter.
+*
+* This function sets a new value for a specified parameter using the attribute structure provided.
+*
+* @param[in] sessionId  - Session identifier for the set operation.
+* @param[in] objectID  - Object identifier containing the parameter.
+* @param[in] parameterID  - Parameter identifier to set.
+* @param[in] val  - Pointer to parameterAttributeStruct_t containing new value and attributes.
+*
+* @return None.
+*
 */
 void CcspManagementServer_SetSingleParameterValue(
     int sessionId,
@@ -286,8 +418,18 @@ void CcspManagementServer_SetSingleParameterValue(
     parameterAttributeStruct_t *val
     );
 
-/* Set single object attributes. 
- * All the parameters with this prefix are set here.
+
+/**
+* @brief Set single object attributes for all parameters.
+*
+* This function sets attributes for all parameters that match the object path prefix.
+*
+* @param[in] sessionId  - Session identifier for the set operation.
+* @param[in] objectID  - Object identifier whose parameters will be updated.
+* @param[in] val  - Pointer to parameterAttributeStruct_t containing attributes to set.
+*
+* @return The number of parameters updated.
+*
 */
 int CcspManagementServer_SetSingleObjectAttributes(
     int sessionId,
@@ -295,87 +437,253 @@ int CcspManagementServer_SetSingleObjectAttributes(
     parameterAttributeStruct_t *val
     );
 
-/* For each parameter, add one record item to attr.
- * Return how many records have been added. 
- */
+
+/**
+* @brief Get attributes for all parameters in an object.
+*
+* This function retrieves attributes for all parameters in the specified object,
+* populating the attribute array. For each parameter, add one record item to attributes.
+*
+* @param[in] objectID  - Object identifier whose attributes will be retrieved.
+* @param[in,out] attr  - Pointer to parameterAttributeStruct_t array to populate.
+* @param[in] beginAttrID  - Starting index in the attribute array to begin populating.
+*
+* @return The number of records have been added to the array.
+*
+*/
 int CcspManagementServer_GetSingleObjectAttributes(
     int objectID,
     parameterAttributeStruct_t **attr,
     int beginAttrID
     );
 
-/* Get attribute of one parameter. 
- */
+
+/**
+* @brief Get attribute of one parameter.
+*
+* This function retrieves the  attributes for a specified parameter.
+*
+* @param[in] objectID  - Object identifier containing the parameter.
+* @param[in] parameterID  - Parameter identifier whose attributes will be retrieved.
+* @param[out] attr  - Pointer to parameterAttributeStruct_t to populate with attributes.
+*
+* @return None.
+*
+*/
 void CcspManagementServer_GetSingleParameterAttributes(
     int objectID,
     int parameterID,
     parameterAttributeStruct_t *attr
     );
 
-/* Commit the parameter setting stored in parameterSetting.
- */
+
+/**
+* @brief Commit the parameter setting stored in parameterSetting.
+*
+* This function commits all validated parameter values that have been staged
+* in the parameterSetting array, writing them to PSM database.
+*
+* @param[in] writeID  - Write operation identifier for tracking the commit.
+*
+* @return The commit result.
+* @retval 0 if commit is successful.
+*
+*/
 int CcspManagementServer_CommitParameterValues(unsigned int writeID);
 
-/* Roll back the parameters already being committed.
- */
+
+/**
+* @brief Roll back the parameters already being committed.
+*
+* This function restores parameter values to their previous state,
+* undoing changes that were committed in the current session.
+*
+* @return The rollback result.
+* @retval 0 if rollback is successful.
+*
+*/
 int CcspManagementServer_RollBackParameterValues();
 
-/* The parameter setting values are stored in ParameterSetting before commit.
- * After commit or cancel, ParameterSetting is freed by this function.
- */
+
+/**
+* @brief Free parameter setting resources.
+*
+* The parameter setting values are stored in ParameterSetting before commit.
+* After commit or cancel, ParameterSetting is freed by this function.
+*
+* @return The operation result.
+* @retval 0 if resources freed successfully.
+*
+*/
 int CcspManagementServer_FreeParameterSetting();
 
-/* There is dismatch between objectID here and objectID in PA. */
+
+/**
+* @brief Map Management Server object ID to PA object ID.
+*
+* This function translates between the Management Server's internal object ID
+* and the Protocol Agent's object ID, handling the mismatch between the two
+* numbering schemes. There is dismatch between objectID here and objectID in PA.
+*
+* @param[in] objectID  - Management Server object identifier to map.
+*
+* @return The corresponding Protocol Agent object identifier.
+*
+*/
 int CcspManagementServer_GetPAObjectID
 (
     int objectID
 );
 
-/* Malloc memory that will be freed by other modules.
-  */
+
+/**
+* @brief Merge two strings with memory allocation.
+*
+* This function concatenates two strings, allocating Malloc memory that will be freed by other modules.
+*
+* @param[in] src1  - First source string to merge.
+* @param[in] src2  - Second source string to merge.
+*
+* @return Pointer to newly allocated merged string.
+* @retval Pointer to a null-terminated string containing the concatenation of src1 and src2 on success.
+* @retval NULL if memory allocation fails or if both src1 and src2 are NULL/empty strings.
+*
+*/
 char * CcspManagementServer_MergeString
     (
     const char * src1,
     const char * src2
     );
 
+/**
+* @brief Restore all parameters to default values.
+*
+* This function resets all Management Server parameters to their factory
+* default values as defined in the data model.
+*
+* @return The status of the operation.
+* @retval ANSC_STATUS_SUCCESS if restore is successful.
+*
+*/
 ANSC_STATUS
 CcspManagementServer_RestoreDefaultValues
     (
         void
     );
 
+/**
+* @brief Store encrypted password value to database.
+*
+* This function encrypts and stores a Management Server password to the PSM database.
+*
+* @param[in] pString  - Plain text password string to encrypt and store.
+* @param[in] parameterID  - Parameter identifier indicating which password field.
+*
+* @return The operation result.
+* @retval 0 if password stored successfully.
+* @retval TR69_INVALID_ARGUMENTS if invalid argument.
+*
+*/
 int CcspManagementServer_StoreMGMTServerPasswordValuesintoDB
-	( 
-		char *pString, 
-		int parameterID 
+	(
+		char *pString,
+		int parameterID
 	);
 
+/**
+* @brief Get decrypted password value from database.
+*
+* This function retrieves and decrypts a Management Server password from
+* the PSM database or NVRAM storage.
+*
+* @param[in] parameterID  - Parameter identifier indicating which password field.
+* @param[out] pOutputString  - Buffer to store the decrypted password string.
+*
+* @return The operation result.
+* @retval 0 if password retrieved successfully.
+* @retval TR69_INVALID_ARGUMENTS if invalid argument.
+*
+*/
 int CcspManagementServer_GetMGMTServerPasswordValuesFromDB
-	( 
-		int parameterID, 
-		char *pOutputString 
+	(
+		int parameterID,
+		char *pOutputString
 	);
 
+/**
+* @brief Retrieve and decrypt password from NVRAM file.
+*
+* This function reads an encrypted password from a file in NVRAM storage
+* and decrypts it using the platform's decryption key.
+*
+* @param[in] parameterID  - Parameter identifier indicating which password field.
+* @param[in] pInputFile  - Path to the encrypted password file in NVRAM.
+* @param[out] pOutputString  - Buffer to store the decrypted password string.
+*
+* @return The operation result.
+* @retval 0 if password retrieved and decrypted successfully.
+* @retval TR69_INTERNAL_ERROR if the input file does not exist, file operations fail, or secure system call fails.
+*
+*/
 int CcspManagementServer_RetrievePassword
-	( 
+	(
         int parameterID,
-		char *pInputFile, 
-		char *pOutputString 
+		char *pInputFile,
+		char *pOutputString
 	);
 
+/**
+* @brief Check if encrypted password file exists in database.
+*
+* This function checks whether an encrypted password file exists in PSM
+* database or NVRAM storage for the specified parameter.
+*
+* @param[in] parameterID  - Parameter identifier indicating which password field.
+* @param[out] pIsEncryptFileAvailable  - Pointer to integer flag.
+*
+* @return The operation result.
+* @retval 0 if check completed successfully.
+* @retval TR69_INVALID_ARGUMENTS if invalid argument.
+*
+*/
 int CcspManagementServer_IsEncryptedFileInDB
-	( 
-		int parameterID, 
-		int *pIsEncryptFileAvailable 
+	(
+		int parameterID,
+		int *pIsEncryptFileAvailable
 	);
 
+/**
+* @brief Get alias-based addressing string for a component.
+*
+* This function retrieves the alias-based addressing capability string for a specified CCSP component.
+*
+* @param[in] ComponentName  - Name of the CCSP component to query.
+*
+* @return Pointer to alias-based addressing string.
+*
+*/
 CCSP_STRING
 CcspManagementServer_GetAliasBasedAddressingStr
     (
         CCSP_STRING                 ComponentName
     );
 
+/**
+* @brief Utility function to get multiple parameter values.
+*
+* This function retrieves values for multiple parameters specified by name,
+* allocating and populating an array of parameterValStruct_t structures.
+*
+* @param[in] parameterNames  - Array of parameter name strings to retrieve.
+* @param[in] size  - Number of parameter names in the input array.
+* @param[out] pval_size  - Pointer to store the number of values retrieved.
+* @param[out] pppval  - Pointer to parameterValStruct_t array pointer to populate.
+*
+* @return The status of the operation.
+* @retval ANSC_STATUS_SUCCESS if values retrieved successfully.
+* @retval ANSC_STATUS_FAILURE if component error occurs.
+*
+*/
 ANSC_STATUS
 CcspManagementServer_UtilGetParameterValues
     (
@@ -385,6 +693,19 @@ CcspManagementServer_UtilGetParameterValues
         parameterValStruct_t***     pppval
     );
 
+/**
+* @brief Free parameter value structure array.
+*
+* This function frees memory allocated by UtilGetParameterValues, including
+* the parameterValStruct_t array and all contained strings.
+*
+* @param[in] val_size  - Number of elements in the parameter value array.
+* @param[in] ppval  - Pointer to parameterValStruct_t array to free.
+*
+* @return The status of the operation.
+* @retval ANSC_STATUS_SUCCESS if memory freed successfully.
+*
+*/
 ANSC_STATUS
 CcspManagementServer_UtilFreeParameterValStruct
     (
@@ -392,24 +713,91 @@ CcspManagementServer_UtilFreeParameterValStruct
         parameterValStruct_t**      ppval
     );
 
+/**
+* @brief Initialize DBus with custom callbacks.
+*
+* This function initializes the DBus connection with custom callback functions
+* for handling component-specific operations.
+*
+* @param[in] cb  - Pointer to CCSP_Base_Func_CB structure containing callback functions.
+*
+* @return None.
+*
+*/
 CCSP_VOID CcspManagementServer_InitDBusCustom(CCSP_Base_Func_CB *cb);
 
+/**
+* @brief Get object ID from parameter name.
+*
+* This function retrieves the internal object identifier from a full parameter
+* or object name, returning both the object ID and the remaining name portion.
+*
+* @param[in] parameterName  - Full parameter or object name to parse.
+*                             Must be a full object name ending with '.' or full parameter name.
+* @param[out] name  - Pointer to store the remaining parameter name portion.
+*                     Points into the input parameterName string.
+*
+* @return The object identifier.
+* @retval object ID  on success.
+* @retval -1 if object not found.
+*
+*/
 int CcspManagementServer_GetObjectID(
     char *parameterName,   /* name has to be a full object name (ends with .) or full parameter name */
     char **name
     );
 
+/**
+* @brief Get parameter ID from parameter name.
+*
+* This function retrieves the internal parameter identifier for a given
+* parameter name (without object path prefix) within a specified object.
+*
+* @param[in] objectID  - Object identifier to search within.
+* @param[in] paraName  - Pure parameter name without object name prefix.
+*
+* @return The parameter identifier.
+* @retval -1 if parameter not found.
+*
+*/
 int CcspManagementServer_GetParameterID(
     int objectID,
     char *paraName   /* parameterName is the pure name without object name prefix. */
     );
 
+/**
+* @brief Get all parameter values for an object.
+*
+* This function retrieves all parameters and their values for a given object,
+* populating a parameterValStruct_t array starting at a specified index.
+*
+* @param[in] objectID  - Object identifier to retrieve parameters from.
+* @param[in,out] val  - Pointer to parameterValStruct_t array to populate.
+* @param[in] beginValID  - Starting index in the value array to begin populating.
+*
+* @return The number of values added to the array.
+*
+*/
 int CcspManagementServer_GetSingleObjectValues(
     int objectID,
     parameterValStruct_t **val,
     int beginValID
     );
 
+/**
+* @brief Set attributes of a single parameter.
+*
+* This function sets notification and access control attributes for a specified parameter.
+*
+* @param[in] sessionId  - Session identifier for the set operation.
+* @param[in] objectID  - Object identifier containing the parameter.
+* @param[in] parameterID  - Parameter identifier whose attributes will be set.
+* @param[in] val  - Pointer to parameterAttributeStruct_t containing attributes to set.
+*
+* @return The number of attributes set.
+* @retval ANSC_STATUS_SUCCESS if attribute set successfully.
+*
+*/
 int CcspManagementServer_SetSingleParameterAttributes(
     int sessionId,
     int objectID,
