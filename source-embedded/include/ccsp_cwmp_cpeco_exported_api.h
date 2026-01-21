@@ -19,13 +19,13 @@
 
 /**********************************************************************
    Copyright [2014] [Cisco Systems, Inc.]
- 
+
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
- 
+
        http://www.apache.org/licenses/LICENSE-2.0
- 
+
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -79,6 +79,24 @@
        FUNCTIONS IMPLEMENTED IN CCSP_CWMP_CPECO_INTERFACE.C
 ***********************************************************/
 
+/**
+* @brief Create a new CCSP CWMP CPE Controller object.
+*
+* This function creates and initializes a new CCSP CWMP CPE Controller object.
+*
+* @param[in] pTr069PAName  - TR-069 Protocol Agent component name.
+* @param[in] pCRName  - Component Registrar (CR) name for message bus communication.
+* @param[in] hContainerContext  - Container context handle.
+*                                 This context is transparent to the object mapper and meaningful only to the caller.
+* @param[in] hOwnerContext  - Owner context handle.
+*                             This context is transparent to the object mapper and meaningful only to the caller.
+* @param[in] hAnscReserved  - Reserved context handle.
+*                             This context is transparent to the object mapper and meaningful only to the caller.
+*
+* @return Handle of the newly created CPE Controller object.
+* @retval Handle of the object mapper object on success.
+*
+*/
 ANSC_HANDLE
 CcspCwmpCreateCpeController
     (
@@ -94,6 +112,22 @@ CcspCwmpCreateCpeController
           FUNCTIONS IMPLEMENTED IN CCSP_CWMP_CPECO_BASE.C
 ***********************************************************/
 
+/**
+* @brief Construct the CCSP CWMP CPE Controller object.
+*
+* This function constructs the CPE Controller object, allocates memory, and initializes
+* member variables and functions. It enrolls component objects and initializes the controller.
+*
+* @param[in] hContainerContext  - Container context handle.This handle is used by the container object to interact
+*                                 with the outside world. It could be the real container or an target object.
+* @param[in] hOwnerContext  - Owner context handle. This handle is passed in by the owner of this object.
+* @param[in] hAnscReserved  - Reserved context handle. This handle is passed in by the owner of this object.
+*
+* @return Handle of the newly created container object, or NULL if allocation fails.
+* @retval A valid handle to the newly created container object upon success.
+* @retval NULL if memory allocation for the object fails.
+*
+*/
 ANSC_HANDLE
 CcspCwmpCpecoCreate
     (
@@ -102,18 +136,58 @@ CcspCwmpCpecoCreate
         ANSC_HANDLE                 hAnscReserved
     );
 
+/**
+* @brief Destroy the CCSP CWMP CPE Controller object.
+*
+* The function destroys the CPE Controller object by canceling all operations, resetting state,
+* removing all subsystems and child objects, freeing resources, and releasing all allocated memory.
+*
+* @param[in] hThisObject  - Handle to the CPE Controller object to destroy.
+*                           This is actually the pointer to the object itself.
+*
+* @return The status of the operation.
+* @retval ANSC_STATUS_SUCCESS if the object is destroyed successfully.
+*
+*/
 ANSC_STATUS
 CcspCwmpCpecoRemove
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/**
+* @brief Enroll all objects required by the CPE Controller.
+*
+* This function enrolls all dependent objects required by the CPE Controller.
+*
+* @param[in] hThisObject  - Handle to the CPE Controller object.
+*                           This is actually the pointer to the object itself.
+*
+* @return The status of the operation.
+* @retval ANSC_STATUS_SUCCESS if all objects enrolled successfully.
+* @retval ANSC_STATUS_RESOURCES if memory allocation fails for any child object or interface.
+*
+*/
 ANSC_STATUS
 CcspCwmpCpecoEnrollObjects
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/**
+* @brief Initialize the CCSP CWMP CPE Controller object.
+*
+* This function first calls the initialization member function of the base class
+* object to set the common member fields inherited from the base class.
+* It then initializes the member fields that are specific to this object.
+*
+* @param[in] hThisObject  - Handle to the CPE Controller object.
+*                           This is actually the pointer to the object itself.
+*
+* @return The status of the operation.
+* @retval ANSC_STATUS_SUCCESS if initialization is successful.
+*
+*/
 ANSC_STATUS
 CcspCwmpCpecoInitialize
     (

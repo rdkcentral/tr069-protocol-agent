@@ -19,13 +19,13 @@
 
 /**********************************************************************
    Copyright [2014] [Cisco Systems, Inc.]
- 
+
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
- 
+
        http://www.apache.org/licenses/LICENSE-2.0
- 
+
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -100,12 +100,39 @@
  * Since we write all kernel modules in C (due to better performance and lack of compiler support),
  * we have to simulate the C++ object by encapsulating a set of functions inside a data structure.
  */
+
+/**
+ * @brief Get context handle from the ACS Connection object.
+ *
+ * This function pointer type defines the signature for retrieving a context handle
+ * associated with the CCSP CWMP ACS Connection object.
+ *
+ * @param[in] hThisObject - Handle to the CCSP CWMP ACS Connection object.
+ *
+ * @return Handle to the context object
+ * @retval Handle to the context object on success.
+ * @retval NULL if not set.
+ *
+ */
 typedef  ANSC_HANDLE
 (*PFN_CWMPACSCO_GET_CONTEXT)
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/**
+ * @brief Set context handle for the ACS Connection object.
+ *
+ * This function pointer type defines the signature for setting a context handle
+ * in the CCSP CWMP ACS Connection object.
+ *
+ * @param[in] hThisObject - Handle to the CCSP CWMP ACS Connection object.
+ * @param[in] hContext    - Handle to the context object to be set.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS if the operation is successful.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPACSCO_SET_CONTEXT)
     (
@@ -113,12 +140,37 @@ typedef  ANSC_STATUS
         ANSC_HANDLE                 hContext
     );
 
+/**
+ * @brief Get interface handle from the ACS Connection object.
+ *
+ * This function pointer type defines the signature for retrieving an interface handle
+ * from the CCSP CWMP ACS Connection object.
+ *
+ * @param[in] hThisObject - Handle to the CCSP CWMP ACS Connection object.
+ *
+ * @return Handle to the interface object
+ * @retval Handle to the interface object on success.
+ * @retval NULL if the interface is not available.
+ *
+ */
 typedef  ANSC_HANDLE
 (*PFN_CWMPACSCO_GET_IF)
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/**
+ * @brief Set interface handle for the ACS Connection object.
+ *
+ * This function pointer type defines the signature for setting an interface handle
+ * in the CCSP CWMP ACS Connection object.
+ *
+ * @param[in] hThisObject - Handle to the CCSP CWMP ACS Connection object.
+ * @param[in] hInterface  - Handle to the interface object to be set.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS if the operation is successful.
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPACSCO_SET_IF)
     (
@@ -126,12 +178,42 @@ typedef  ANSC_STATUS
         ANSC_HANDLE                 hInterface
     );
 
+/**
+ * @brief Get a string attribute from the ACS Connection object.
+ *
+ * This function pointer type defines the signature for retrieving string attributes
+ * such as ACS URL, Username, or Password from the CCSP CWMP ACS Connection object.
+ *
+ * @param[in] hThisObject - Handle to the CCSP CWMP ACS Connection object.
+ *
+ * @return Pointer to the string attribute.
+ * @return Pointer to the string attribute on success.
+ * @return NULL if not set.
+ *
+ */
 typedef  char*
 (*PFN_CWMPACSCO_GET_NAME)
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/**
+ * @brief Set a string attribute for the ACS Connection object.
+ *
+ * This function pointer type defines the signature for setting string attributes
+ * such as ACS URL, Username, or Password in the CCSP CWMP ACS Connection object.
+ * For ACS URL, the function converts x-dslf_cwmp:// and x-dslf_cwmps:// schemes
+ * to standard http:// and https:// formats.
+ *
+ * @param[in] hThisObject - Handle to the CCSP CWMP ACS Connection object.
+ * @param[in] pName       - Pointer to the string value to be set.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS if the operation is successful.
+ * @retval ANSC_STATUS_RESOURCES if memory allocation fails.
+ * @retval ANSC_STATUS_FAILURE if string copy operation fails.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPACSCO_SET_NAME)
     (
@@ -139,6 +221,18 @@ typedef  ANSC_STATUS
         char*                       pName
     );
 
+/**
+ * @brief Get property data from the ACS Connection object.
+ *
+ * This function pointer type defines the signature for retrieving the property
+ * structure of the CCSP CWMP ACS Connection object.
+ *
+ * @param[in]  hThisObject - Handle to the CCSP CWMP ACS Connection object.
+ * @param[out] hProperty   - Handle to the property structure to be filled with current property values.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS if the operation is successful.
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPACSCO_GET_PROPERTY)
     (
@@ -146,6 +240,18 @@ typedef  ANSC_STATUS
         ANSC_HANDLE                 hProperty
     );
 
+/**
+ * @brief Set property data for the ACS Connection object.
+ *
+ * This function pointer type defines the signature for configuring the property
+ * structure of the CCSP CWMP ACS Connection object.
+ *
+ * @param[in] hThisObject - Handle to the CCSP CWMP ACS Connection object.
+ * @param[in] hProperty   - Handle to the property structure containing new configuration values.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS if the operation is successful.
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPACSCO_SET_PROPERTY)
     (
@@ -153,24 +259,78 @@ typedef  ANSC_STATUS
         ANSC_HANDLE                 hProperty
     );
 
+/**
+ * @brief Reset the ACS Connection object to its initial state.
+ *
+ * This function pointer type defines the signature for resetting the CCSP CWMP ACS Connection object.
+ *
+ * @param[in] hThisObject - Handle to the CCSP CWMP ACS Connection object.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS if the operation is successful.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPACSCO_RESET)
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/**
+ * @brief Connect to the Auto-Configuration Server (ACS).
+ *
+ * This function pointer type defines the signature for establishing an HTTP/HTTPS connection to the ACS.
+ *
+ * @param[in] hThisObject - Handle to the CCSP CWMP ACS Connection object.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS if the connection is successfully established.
+ * @retval ANSC_STATUS_NOT_READY if the ACS URL is not configured or invalid.
+ * @retval ANSC_STATUS_FAILURE if the connection fails.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPACSCO_CONNECT)
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/**
+ * @brief Perform a generic action on the ACS Connection object.
+ *
+ * This function pointer type defines the signature for performing generic actions
+ * on the CCSP CWMP ACS Connection object.
+ *
+ * @param[in] hThisObject - Handle to the CCSP CWMP ACS Connection object.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS if the action is successful.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPACSCO_ACTION)
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/**
+ * @brief Send a SOAP request to the ACS and receive the response.
+ *
+ * This function pointer type defines the signature for sending TR-069 SOAP messages
+ * to the ACS via HTTP/HTTPS.
+ *
+ * @param[in] hThisObject   - Handle to the CCSP CWMP ACS Connection object.
+ * @param[in] pSoapMessage  - Pointer to the SOAP message body to send. Can be NULL for empty requests.
+ * @param[in] pMethodName   - Pointer to the first SOAP method name for the SOAPAction header.
+ * @param[in] ulReqEnvCount - Number of SOAP envelopes in the request. 0 for empty requests.
+ * @param[in] ulRepEnvCount - Expected number of SOAP envelopes in the response.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS if the request is sent and response received successfully.
+ * @retval ANSC_STATUS_NOT_READY if the ACS URL is not configured or invalid.
+ * @retval ANSC_STATUS_FAILURE if the request fails.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPACSCO_REQUEST)
     (
@@ -181,12 +341,37 @@ typedef  ANSC_STATUS
         ULONG                       ulRepEnvCount
     );
 
+/**
+ * @brief Close the connection to the ACS.
+ *
+ * This function pointer type defines the signature for closing the HTTP/HTTPS connection to the ACS.
+ *
+ * @param[in] hThisObject - Handle to the CCSP CWMP ACS Connection object.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS if the connection is successfully closed.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPACSCO_CLOSE)
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/**
+ * @brief Add an HTTP cookie for future requests to the ACS.
+ *
+ * This function pointer type defines the signature for adding cookies received from the ACS.
+ *
+ * @param[in] hThisObject - Handle to the CCSP CWMP ACS Connection object.
+ * @param[in] pCookie     - Pointer to the cookie string in Set-Cookie header format.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS if the cookie is successfully added.
+ * @retval ANSC_STATUS_DISCARD if the maximum number of cookies is exceeded.
+ * @retval ANSC_STATUS_RESOURCES if memory allocation fails.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPACSCO_ADD_COOKIE)
     (
@@ -194,12 +379,37 @@ typedef  ANSC_STATUS
         PCHAR                       pCookie
     );
 
+/**
+ * @brief Remove all saved HTTP cookies.
+ *
+ * This function pointer type defines the signature for clearing all cookies that were
+ * previously received from the ACS.
+ *
+ * @param[in] hThisObject - Handle to the CCSP CWMP ACS Connection object.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS if all cookies are successfully removed.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPACSCO_REMOVE_COOKIES)
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/**
+ * @brief Find a cookie by name in the stored cookie list.
+ *
+ * This function pointer type defines the signature for searching stored cookie with specified name.
+ *
+ * @param[in] hThisObject  - Handle to the CCSP CWMP ACS Connection object.
+ * @param[in] pCookieName  - Pointer to the cookie name to search for.
+ *
+ * @return Index of the cookie in the cookie array.
+ * @retval Index of the cookie if found.
+ * @retval -1 if cookie with specified name is not found..
+ *
+ */
 typedef	 int
 (*PFN_CWMPACSCO_FIND_COOKIE)
 	(
@@ -207,6 +417,20 @@ typedef	 int
 		PCHAR                       pCookieName
 	);
 
+/**
+ * @brief Delete a cookie at the specified index.
+ *
+ * This function pointer type defines the signature for removing a specific cookie
+ * from the stored cookie list by its index.
+ *
+ * @param[in] hThisObject - Handle to the CCSP CWMP ACS Connection object.
+ * @param[in] ulIndex     - Index of the cookie to be deleted.
+ *
+ * @return The status of the operation.
+ * @retval ANSC_STATUS_SUCCESS if the cookie is successfully deleted.
+ * @retval ANSC_STATUS_BAD_PARAMETER if the index is out of range.
+ *
+ */
 typedef	 ANSC_STATUS
 (*PFN_CWMPACSCO_DEL_COOKIE)
 	(

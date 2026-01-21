@@ -19,13 +19,13 @@
 
 /**********************************************************************
    Copyright [2014] [Cisco Systems, Inc.]
- 
+
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
- 
+
        http://www.apache.org/licenses/LICENSE-2.0
- 
+
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -95,6 +95,35 @@
 /*
  * Since we write all kernel modules in C (due to better performance and lack of compiler support), we
  * have to simulate the C++ object by encapsulating a set of functions inside a data structure.
+ */
+/**
+ * @brief Get a static resource from the mini web service.
+ *
+ * This function pointer typedef defines the callback interface for retrieving static resources from
+ * the mini web service. When an HTTP GET request is received by the connection request handler, this
+ * method is called to fetch the requested resource content based on the URL path. The function returns
+ * the resource data along with its associated media type (for Content-Type header) and resource length.
+ * This enables the CPE to serve static content such as HTML pages, images, JavaScript, CSS, or configuration
+ * files through the TR-069 connection request HTTP server.
+ *
+ * @param[in]     hThisObject         - Handle to the MWS interface object instance.
+ * @param[in]     pUrlPath            - Absolute URL path string relative to web root.
+ *                                       \n Used to locate the resource in the virtual filesystem or storage.
+ * @param[out]    pMediaType          - Buffer to receive the media type string for the resource.
+ *                                       \n Used to construct the HTTP Content-Type header in the response.
+ *                                       \n Buffer must be pre-allocated by caller.
+ * @param[in,out] pulMediaTypeLength  - Pointer to media type buffer length.
+ *                                       \n IN: Maximum size of pMediaType buffer in bytes.
+ *                                       \n OUT: Actual length of media type string written (excluding null terminator).
+ *                                       \n Typical buffer size: 256 bytes.
+ * @param[out]    pulResourceLen      - Pointer to receive the length of the returned resource data in bytes.
+ *                                       \n Valid range: 0 to MAX_ULONG.
+ *                                       \n Used to construct the HTTP Content-Length header.
+ *
+ * @return Pointer to allocated buffer containing the resource data
+ * @retval Pointer to allocated buffer containing the resource data on success.
+ * @retval NULL if resource not found or error occurred.
+ *
  */
 typedef  char*
 (*PFN_CWMPMWSIF_GET_RES)

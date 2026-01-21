@@ -19,13 +19,13 @@
 
 /**********************************************************************
    Copyright [2014] [Cisco Systems, Inc.]
- 
+
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
- 
+
        http://www.apache.org/licenses/LICENSE-2.0
- 
+
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -155,12 +155,41 @@ CCSP_CWMP_TCPCR_HANDLER_SESSINFO, *PCCSP_CWMP_TCPCR_HANDLER_SESSINFO;
  * Since we write all kernel modules in C (due to better performance and lack of compiler support),
  * we have to simulate the C++ object by encapsulating a set of functions inside a data structure.
  */
+
+/**
+ * @brief Retrieves a context handle from the CCSP CWMP TCP Connection Request Handler object.
+ *
+ * This function pointer typedef defines the interface for retrieving internal context handles
+ * from the TCP Connection Request Handler, specifically the CPE Controller handle. These context
+ * handles are used for inter-object communication within the TR-069 framework.
+ *
+ * @param[in] hThisObject Handle to the CCSP CWMP TCP Connection Request Handler object itself.
+ *
+ * @return Handle to the requested context object.
+ * @retval Valid ANSC_HANDLE  Successfully retrieved context handle (CPE Controller).
+ * @retval NULL               Context not set or object not initialized.
+ *
+ */
 typedef  ANSC_HANDLE
 (*PFN_CWMPTCPCRHO_GET_CONTEXT)
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/**
+ * @brief Configures a context handle in the CCSP CWMP TCP Connection Request Handler object.
+ *
+ * This function pointer typedef defines the interface for setting internal context handles,
+ * specifically the CPE Controller handle. This establishes the relationship between the TCP
+ * Connection Request Handler and the CPE Controller for processing connection requests.
+ *
+ * @param[in] hThisObject Handle to the CCSP CWMP TCP Connection Request Handler object itself.
+ * @param[in] hContext    Handle to the context object (CPE Controller) to be configured.
+ *
+ * @return Status of the operation.
+ * @retval ANSC_STATUS_SUCCESS  Successfully configured context handle.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPTCPCRHO_SET_CONTEXT)
     (
@@ -168,12 +197,40 @@ typedef  ANSC_STATUS
         ANSC_HANDLE                 hContext
     );
 
+/**
+ * @brief Retrieves an interface handle from the CCSP CWMP TCP Connection Request Handler object.
+ *
+ * This function pointer typedef defines the interface for retrieving the Web Access Control
+ * Manager (ACM) interface handle. This interface is used for authentication and authorization
+ * of incoming TCP connection requests from the ACS.
+ *
+ * @param[in] hThisObject Handle to the CCSP CWMP TCP Connection Request Handler object itself.
+ *
+ * @return Handle to the requested interface.
+ * @retval Valid ANSC_HANDLE  Successfully retrieved Web ACM interface handle.
+ * @retval NULL               Interface not configured or not initialized.
+ *
+ */
 typedef  ANSC_HANDLE
 (*PFN_CWMPTCPCRHO_GET_IF)
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/**
+ * @brief Configures an interface handle in the CCSP CWMP TCP Connection Request Handler object.
+ *
+ * This function pointer typedef defines the interface for setting the Web Access Control
+ * Manager (ACM) interface handle. This interface provides authentication and authorization
+ * services for validating incoming TCP connection requests.
+ *
+ * @param[in] hThisObject Handle to the CCSP CWMP TCP Connection Request Handler object itself.
+ * @param[in] hInterface  Handle to the Web ACM interface object to be configured.
+ *
+ * @return Status of the operation.
+ * @retval ANSC_STATUS_SUCCESS  Successfully configured interface handle.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPTCPCRHO_SET_IF)
     (
@@ -181,6 +238,21 @@ typedef  ANSC_STATUS
         ANSC_HANDLE                 hInterface
     );
 
+/**
+ * @brief Retrieves the property configuration from the CCSP CWMP TCP Connection Request Handler.
+ *
+ * This function pointer typedef defines the interface for retrieving the handler's property
+ * configuration, which includes host address, port, server mode, session timeout, and
+ * authentication properties. The property data is copied into the caller-provided structure.
+ *
+ * @param[in] hThisObject Handle to the CCSP CWMP TCP Connection Request Handler object itself.
+ * @param[out] hProperty  Handle to the property data structure to be filled with current
+ *                        configuration (CCSP_CWMP_TCPCR_HANDLER_PROPERTY).
+ *
+ * @return Status of the operation.
+ * @retval ANSC_STATUS_SUCCESS  Successfully retrieved property configuration.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPTCPCRHO_GET_PROPERTY)
     (
@@ -188,6 +260,21 @@ typedef  ANSC_STATUS
         ANSC_HANDLE                 hProperty
     );
 
+/**
+ * @brief Configures the property settings for the CCSP CWMP TCP Connection Request Handler.
+ *
+ * This function pointer typedef defines the interface for setting the handler's property
+ * configuration, which includes host address, port, server mode, session timeout, and
+ * authentication properties. The property data is copied from the caller-provided structure.
+ *
+ * @param[in] hThisObject Handle to the CCSP CWMP TCP Connection Request Handler object itself.
+ * @param[in] hProperty   Handle to the property data structure containing the configuration
+ *                        to be applied (CCSP_CWMP_TCPCR_HANDLER_PROPERTY).
+ *
+ * @return Status of the operation.
+ * @retval ANSC_STATUS_SUCCESS  Successfully configured property settings.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPTCPCRHO_SET_PROPERTY)
     (
@@ -195,24 +282,85 @@ typedef  ANSC_STATUS
         ANSC_HANDLE                 hProperty
     );
 
+/**
+ * @brief Resets the CCSP CWMP TCP Connection Request Handler object to initial state.
+ *
+ * This function pointer typedef defines the interface for resetting the handler object.
+ * When used as ResetProperty, it resets property configuration to defaults. When used as Reset, it
+ * resets runtime state including magic ID and last access time.
+ *
+ * @param[in] hThisObject Handle to the CCSP CWMP TCP Connection Request Handler object itself.
+ *
+ * @return Status of the operation.
+ * @retval ANSC_STATUS_SUCCESS  Successfully reset object state or properties.
+ * @retval ANSC_STATUS_FAILURE  Failed to copy string values during property reset.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPTCPCRHO_RESET)
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/**
+ * @brief Engages the CCSP CWMP TCP Connection Request Handler to start processing requests.
+ *
+ * This function pointer typedef defines the interface for activating the handler. It creates
+ * TCP servers via CreateTcpServers, configures server mode (XSocket support), sets engine and
+ * socket counts, configures host address/port, and engages the TCP server to listen for
+ * incoming connection requests from the ACS on port 7547.
+ *
+ * @param[in] hThisObject Handle to the CCSP CWMP TCP Connection Request Handler object itself.
+ *
+ * @return Status of the operation.
+ * @retval ANSC_STATUS_SUCCESS  Successfully engaged TCP Connection Request Handler.
+ * @retval ANSC_STATUS_FAILURE  Failed to set host address during server configuration.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPTCPCRHO_ENGAGE)
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/**
+ * @brief Cancels the CCSP CWMP TCP Connection Request Handler's active operations.
+ *
+ * This function pointer typedef defines the interface for deactivating the handler. It sets
+ * bActive to FALSE, cancels the TCP server to stop accepting new connections, and removes
+ * TCP servers via RemoveTcpServers to tear down the listening infrastructure. If already
+ * inactive, returns immediately.
+ *
+ * @param[in] hThisObject Handle to the CCSP CWMP TCP Connection Request Handler object itself.
+ *
+ * @return Status of the operation.
+ * @retval ANSC_STATUS_SUCCESS  Successfully canceled TCP Connection Request Handler operations.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPTCPCRHO_CANCEL)
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/**
+ * @brief Processes incoming TCP connection request messages from the ACS.
+ *
+ * This function pointer typedef defines the interface for processing connection request
+ * messages received on the TCP server. It validates the request format, performs authentication
+ * via VerifyCredential if Web ACM interface is configured, generates HTTP response, sends the response back to the ACS, and signals the CPE Controller to
+ * initiate a CWMP session if authentication succeeds.
+ *
+ * @param[in] hThisObject Handle to the CCSP CWMP TCP Connection Request Handler object itself.
+ * @param[in] hSocket     Handle to the socket from which the message was received.
+ * @param[in] buffer      Pointer to the data buffer containing the connection request message.
+ * @param[in] ulSize      Size of the data buffer in bytes.
+ *
+ * @return Status of the operation.
+ * @retval ANSC_STATUS_SUCCESS    Successfully processed request and sent response.
+ * @retval ANSC_STATUS_RESOURCES  Failed to allocate memory for response message.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPTCPCRHO_PROCESS_REQ)
     (
@@ -222,6 +370,19 @@ typedef  ANSC_STATUS
         ULONG                       ulSize
     );
 
+/**
+ * @brief Authenticates incoming TCP connection requests.
+ *
+ * This function pointer typedef defines the interface for authenticating connection request
+ * messages.
+ *
+ * @param[in] hThisObject Handle to the CCSP CWMP TCP Connection Request Handler object itself.
+ * @param[in] buffer      Pointer to the data buffer containing the request to authenticate.
+ * @param[in] ulSize      Size of the data buffer in bytes.
+ *
+ * @return Status of the authentication operation.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPTCPCRHO_AUTH_REQ)
     (
@@ -230,6 +391,26 @@ typedef  ANSC_STATUS
         ULONG                       ulSize
     );
 
+/**
+ * @brief Verifies client credentials in the TCP connection request message.
+ *
+ * This function pointer typedef defines the interface for validating authentication credentials
+ * provided in the connection request. It extracts HTTP authentication information (Basic or Digest),
+ * retrieves the request host/URI, obtains the password from the Web ACM interface, verifies the
+ * credentials, and updates the session authentication information if verification succeeds.
+ *
+ * @param[in] hThisObject    Handle to the CCSP CWMP TCP Connection Request Handler object itself.
+ * @param[in] buffer         Pointer to the data buffer containing the request with credentials.
+ * @param[in] ulSize         Size of the data buffer in bytes.
+ * @param[in] hSessAuthInfo  Handle to the session's authentication info structure
+ *                           (WEB_AUTH_SESSION_INFO) for credential verification.
+ *
+ * @return Status of the credential verification operation.
+ * @retval ANSC_STATUS_SUCCESS       Successfully verified credentials.
+ * @retval ANSC_STATUS_DO_IT_AGAIN   No authentication information found, retry needed.
+ * @retval ANSC_STATUS_BAD_AUTH_DATA Failed to extract host/URI or invalid credentials.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPTCPCRHO_VERIFY_CRED)
     (
