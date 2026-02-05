@@ -19,13 +19,13 @@
 
 /**********************************************************************
    Copyright [2014] [Cisco Systems, Inc.]
- 
+
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
- 
+
        http://www.apache.org/licenses/LICENSE-2.0
- 
+
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -45,7 +45,7 @@
     description:
 
         This header file contains the prototype definition for all
-        the exported functions provided by the CCSP CWMP Acs 
+        the exported functions provided by the CCSP CWMP Acs
         Connection Object.
 
     ---------------------------------------------------------------
@@ -79,6 +79,21 @@
        FUNCTIONS IMPLEMENTED IN CCSP_CWMP_ACSCO_INTERFACE.C
 ***********************************************************/
 
+/**
+* @brief Create a new CCSP CWMP ACS Connection object.
+*
+* This function creates and initializes a new CCSP CWMP ACS Connection object.
+*
+* @param[in] hContainerContext  - Container context handle. This context is transparent to
+*                                 the object mapper and meaningful only to the caller.
+* @param[in] hOwnerContext  - Owner context handle. This context is transparent to
+*                             the object mapper and meaningful only to the caller.
+* @param[in] hAnscReserved  - Reserved context handle. This context is transparent to
+*                             the object mapper and meaningful only to the caller.
+*
+* @return Handle of the newly created ACS Connection object.
+*
+*/
 ANSC_HANDLE
 CcspCwmpCreateAcsConnection
     (
@@ -92,6 +107,22 @@ CcspCwmpCreateAcsConnection
           FUNCTIONS IMPLEMENTED IN CCSP_CWMP_ACSCO_BASE.C
 ***********************************************************/
 
+/**
+* @brief Construct the CCSP CWMP ACS Connection object.
+*
+* This function constructs the ACS Connection object, allocates memory, and initializes
+* member variables and functions.
+*
+* @param[in] hContainerContext  - Container context handle. Used by the container object to interact with
+*                                 the outside world. It could be the real container or an target object.
+* @param[in] hOwnerContext  - Owner context handle. Passed in by the owner of this object.
+* @param[in] hAnscReserved  - Reserved context handle. Passed in by the owner of this object.
+*
+* @return Handle of the newly created container object, or NULL if allocation fails.
+* @retval Handle of the newly created container object if allocation success.
+* @retval NULL if allocation fails.
+*
+*/
 ANSC_HANDLE
 CcspCwmpAcscoCreate
     (
@@ -100,18 +131,57 @@ CcspCwmpAcscoCreate
         ANSC_HANDLE                 hAnscReserved
     );
 
+/**
+* @brief Destroy the CCSP CWMP ACS Connection object.
+*
+* This function destroys the ACS Connection object and releasing all allocated memory.
+*
+* @param[in] hThisObject  - Handle to the ACS Connection object to destroy.
+*                           This is actually the pointer to the object itself.
+*
+* @return The status of the operation.
+* @retval ANSC_STATUS_SUCCESS if the object is destroyed successfully.
+*
+*/
 ANSC_STATUS
 CcspCwmpAcscoRemove
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/**
+* @brief Enroll all objects required by the ACS Connection.
+*
+* This function enrolls all dependent objects required by the ACS Connection.
+*
+* @param[in] hThisObject  - Handle to the ACS Connection object.
+*                           This is actually the pointer to the object itself.
+*
+* @return The status of the operation.
+* @retval ANSC_STATUS_SUCCESS if objects enrolled successfully.
+* @retval ANSC_STATUS_RESOURCES if memory allocation fails for interfaces or HTTP client.
+* @retval ANSC_STATUS_FAILURE if string copy operation fails.
+*
+*/
 ANSC_STATUS
 CcspCwmpAcscoEnrollObjects
     (
         ANSC_HANDLE                 hThisObject
     );
 
+/**
+* @brief Initialize the CCSP CWMP ACS Connection object.
+*
+* This function first calls the initialization member function of the base class object to set the common member
+* fields inherited from the base class. It then initializes the member fields that are specific to this object.
+*
+* @param[in] hThisObject  - Handle to the ACS Connection object.
+*                           This is actually the pointer to the object itself.
+*
+* @return The status of the operation.
+* @retval ANSC_STATUS_SUCCESS if initialization is successful.
+*
+*/
 ANSC_STATUS
 CcspCwmpAcscoInitialize
     (

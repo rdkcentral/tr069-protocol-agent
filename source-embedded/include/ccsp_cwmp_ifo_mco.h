@@ -19,13 +19,13 @@
 
 /**********************************************************************
    Copyright [2014] [Cisco Systems, Inc.]
- 
+
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
- 
+
        http://www.apache.org/licenses/LICENSE-2.0
- 
+
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -98,6 +98,24 @@
  * have to simulate the C++ object by encapsulating a set of functions inside a data structure.
  */
 
+/**
+ * @brief Function pointer type to notify ACS status.
+ *
+ * This callback notifies the session manager about the ACS communication status,
+ * indicating whether more requests are pending and if new requests should be held.
+ *
+ * @param[in] hThisObject      Handle to the CWMP session object.
+ * @param[in] bNoMoreRequests  Flag indicating no more requests from ACS.
+ *                              - TRUE: No more requests pending from ACS
+ *                              - FALSE: More requests expected from ACS
+ * @param[in] bHoldRequests    Flag indicating whether to hold new requests.
+ *                              - TRUE: Hold new requests temporarily
+ *                              - FALSE: Process requests normally
+ *
+ * @return Status of the operation.
+ * @retval ANSC_STATUS_SUCCESS if notification is successful.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPMCOIF_NOTIFY)
     (
@@ -106,6 +124,20 @@ typedef  ANSC_STATUS
         BOOL                        bHoldRequests
     );
 
+/**
+ * @brief Function pointer type to get the next RPC method type.
+ *
+ * This callback retrieves the type identifier of the next pending RPC method
+ * to be processed, identified by its request ID.
+ *
+ * @param[in] hThisObject  Handle to the CWMP session object.
+ * @param[in] pRequestID   Pointer to request ID string identifying the RPC.
+ *                          Must be a valid, null-terminated string.
+ *
+ * @return RPC method type identifier.
+ * @retval ULONG representing the method type code.
+ *
+ */
 typedef  ULONG
 (*PFN_CWMPMCOIF_GET_TYPE)
     (
@@ -113,6 +145,20 @@ typedef  ULONG
         char*                       pRequestID
     );
 
+/**
+ * @brief Function pointer type to process SOAP response from ACS.
+ *
+ * This callback processes a SOAP response message received from the ACS
+ * in reply to a previous RPC method call from the CPE.
+ *
+ * @param[in] hThisObject    Handle to the CWMP session object.
+ * @param[in] hSoapResponse  Handle to SOAP response envelope structure.
+ *                            Must be a valid CCSP_CWMP_SOAP_RESPONSE handle.
+ *
+ * @return Status of the operation.
+ * @retval ANSC_STATUS_SUCCESS if response processing is successful.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPMCOIF_PROCESS)
     (
@@ -120,6 +166,24 @@ typedef  ANSC_STATUS
         ANSC_HANDLE                 hSoapResponse
     );
 
+/**
+ * @brief Function pointer type to process SOAP error/fault from ACS.
+ *
+ * This callback handles SOAP fault responses received from the ACS when
+ * an RPC method call results in an error condition.
+ *
+ * @param[in] hThisObject  Handle to the CWMP session object.
+ * @param[in] pRequestID   Pointer to request ID string of the failed RPC.
+ *                          Must be a valid, null-terminated string.
+ * @param[in] pMethodName  Pointer to RPC method name that caused the fault.
+ *                          Must be a valid, null-terminated string.
+ * @param[in] hSoapFault   Handle to SOAP fault structure containing error details.
+ *                          Must be a valid CCSP_CWMP_SOAP_FAULT handle.
+ *
+ * @return Status of the operation.
+ * @retval ANSC_STATUS_SUCCESS if fault processing is successful.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPMCOIF_PROCESS2)
     (
@@ -129,6 +193,22 @@ typedef  ANSC_STATUS
         ANSC_HANDLE                 hSoapFault
     );
 
+/**
+ * @brief Function pointer type to invoke unknown/unsupported RPC method.
+ *
+ * This callback handles invocation of RPC methods that are not recognized
+ * or supported by the CPE, typically returning a method not supported fault.
+ *
+ * @param[in] hThisObject  Handle to the CWMP session object.
+ * @param[in] pRequestID   Pointer to request ID string of the RPC.
+ *                          Must be a valid, null-terminated string.
+ * @param[in] pMethodName  Pointer to unknown RPC method name.
+ *                          Must be a valid, null-terminated string.
+ *
+ * @return Status of the operation.
+ * @retval ANSC_STATUS_SUCCESS if fault response is generated successfully.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPMCOIF_INVOKE)
     (
@@ -137,6 +217,20 @@ typedef  ANSC_STATUS
         char*                       pMethodName
     );
 
+/**
+ * @brief Function pointer type to handle GetRPCMethods RPC from ACS.
+ *
+ * This callback processes the GetRPCMethods request, returning a list of
+ * all RPC methods supported by the CPE.
+ *
+ * @param[in] hThisObject  Handle to the CWMP session object.
+ * @param[in] pRequestID   Pointer to request ID string identifying this RPC call.
+ *                          Must be a valid, null-terminated string.
+ *
+ * @return Status of the operation.
+ * @retval ANSC_STATUS_SUCCESS if method list is returned successfully.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPMCOIF_GET_METHODS)
     (
@@ -144,6 +238,26 @@ typedef  ANSC_STATUS
         char*                       pRequestID
     );
 
+/**
+ * @brief Function pointer type to handle SetParameterValues RPC from ACS.
+ *
+ * This callback processes SetParameterValues request, setting one or more
+ * parameter values in the CPE's data model as specified by the ACS.
+ *
+ * @param[in] hThisObject        Handle to the CWMP session object.
+ * @param[in] pRequestID         Pointer to request ID string.
+ *                                Must be a valid, null-terminated string.
+ * @param[in] hParamValueArray   Handle to array of parameter value structures.
+ *                                Each entry contains parameter name, value, and type.
+ * @param[in] ulArraySize        Number of elements in parameter value array.
+ *                                Valid range: 1 to ULONG_MAX.
+ * @param[in] pParamKey          Pointer to parameter key string for tracking changes.
+ *                                Can be NULL or empty string.
+ *
+ * @return Status of the operation.
+ * @retval ANSC_STATUS_SUCCESS if all parameters are set successfully.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPMCOIF_SET_PARAM_V)
     (
@@ -154,6 +268,22 @@ typedef  ANSC_STATUS
         char*                       pParamKey
     );
 
+/**
+ * @brief Function pointer type to handle GetParameterValues RPC from ACS.
+ *
+ * This callback processes GetParameterValues request, retrieving current values
+ * of specified parameters from the CPE's data model.
+ *
+ * @param[in] hThisObject     Handle to the CWMP session object.
+ * @param[in] pRequestID      Pointer to request ID string.
+ *                             Must be a valid, null-terminated string.
+ * @param[in] pParamNameArray Pointer to string array containing parameter names to retrieve.
+ *                             Each entry is a full parameter path or partial path.
+ *
+ * @return Status of the operation.
+ * @retval ANSC_STATUS_SUCCESS if parameter values are retrieved successfully.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPMCOIF_GET_PARAM_V)
     (
@@ -162,6 +292,25 @@ typedef  ANSC_STATUS
         SLAP_STRING_ARRAY*          pParamNameArray
     );
 
+/**
+ * @brief Function pointer type to handle GetParameterNames RPC from ACS.
+ *
+ * This callback processes GetParameterNames request, returning names and writability
+ * of parameters matching the specified path, optionally at next level only.
+ *
+ * @param[in] hThisObject  Handle to the CWMP session object.
+ * @param[in] pRequestID   Pointer to request ID string.
+ *                          Must be a valid, null-terminated string.
+ * @param[in] pParamPath   Pointer to parameter path prefix to search.
+ *                          Can be full object path or partial path.
+ * @param[in] bNextLevel   Flag to limit search to next level only.
+ *                          - TRUE: Return only immediate children
+ *                          - FALSE: Return all descendants recursively
+ *
+ * @return Status of the operation.
+ * @retval ANSC_STATUS_SUCCESS if parameter names are retrieved successfully.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPMCOIF_GET_PARAM_N)
     (
@@ -171,6 +320,24 @@ typedef  ANSC_STATUS
         BOOL                        bNextLevel
     );
 
+/**
+ * @brief Function pointer type to handle SetParameterAttributes RPC from ACS.
+ *
+ * This callback processes SetParameterAttributes request, setting notification
+ * and access control attributes for specified parameters.
+ *
+ * @param[in] hThisObject           Handle to the CWMP session object.
+ * @param[in] pRequestID            Pointer to request ID string.
+ *                                   Must be a valid, null-terminated string.
+ * @param[in] hSetParamAttribArray  Handle to array of parameter attribute structures.
+ *                                   Each entry contains parameter name and attributes to set.
+ * @param[in] ulArraySize           Number of elements in attribute array.
+ *                                   Valid range: 1 to ULONG_MAX.
+ *
+ * @return Status of the operation.
+ * @retval ANSC_STATUS_SUCCESS if attributes are set successfully.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPMCOIF_SET_PARAM_A)
     (
@@ -180,6 +347,22 @@ typedef  ANSC_STATUS
         ULONG                       ulArraySize
     );
 
+/**
+ * @brief Function pointer type to handle GetParameterAttributes RPC from ACS.
+ *
+ * This callback processes GetParameterAttributes request, retrieving notification
+ * and access control attributes for specified parameters.
+ *
+ * @param[in] hThisObject     Handle to the CWMP session object.
+ * @param[in] pRequestID      Pointer to request ID string.
+ *                             Must be a valid, null-terminated string.
+ * @param[in] pParamNameArray Pointer to string array containing parameter names.
+ *                             Each entry is a full parameter path.
+ *
+ * @return Status of the operation.
+ * @retval ANSC_STATUS_SUCCESS if attributes are retrieved successfully.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPMCOIF_GET_PARAM_A)
     (
@@ -188,6 +371,24 @@ typedef  ANSC_STATUS
         SLAP_STRING_ARRAY*          pParamNameArray
     );
 
+/**
+ * @brief Function pointer type to handle AddObject RPC from ACS.
+ *
+ * This callback processes AddObject request, creating a new instance of a
+ * multi-instance object in the CPE's data model.
+ *
+ * @param[in] hThisObject  Handle to the CWMP session object.
+ * @param[in] pRequestID   Pointer to request ID string.
+ *                          Must be a valid, null-terminated string.
+ * @param[in] pObjectName  Pointer to object path where new instance will be created.
+ *                          Must end with a dot and refer to a multi-instance object.
+ * @param[in] pParamKey    Pointer to parameter key string for tracking changes.
+ *                          Can be NULL or empty string.
+ *
+ * @return Status of the operation.
+ * @retval ANSC_STATUS_SUCCESS if object instance is created successfully.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPMCOIF_ADD_OBJECT)
     (
@@ -197,6 +398,24 @@ typedef  ANSC_STATUS
         char*                       pParamKey
     );
 
+/**
+ * @brief Function pointer type to handle DeleteObject RPC from ACS.
+ *
+ * This callback processes DeleteObject request, removing an existing instance
+ * of a multi-instance object from the CPE's data model.
+ *
+ * @param[in] hThisObject  Handle to the CWMP session object.
+ * @param[in] pRequestID   Pointer to request ID string.
+ *                          Must be a valid, null-terminated string.
+ * @param[in] pObjectName  Pointer to full object instance path to delete.
+ *                          Must include instance number and end with a dot.
+ * @param[in] pParamKey    Pointer to parameter key string for tracking changes.
+ *                          Can be NULL or empty string.
+ *
+ * @return Status of the operation.
+ * @retval ANSC_STATUS_SUCCESS if object instance is deleted successfully.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPMCOIF_DEL_OBJECT)
     (
@@ -206,6 +425,22 @@ typedef  ANSC_STATUS
         char*                       pParamKey
     );
 
+/**
+ * @brief Function pointer type to handle Download RPC from ACS.
+ *
+ * This callback processes Download request, causing the CPE to download a file
+ * (such as firmware image or configuration) from the specified URL.
+ *
+ * @param[in] hThisObject   Handle to the CWMP session object.
+ * @param[in] pRequestID    Pointer to request ID string.
+ *                           Must be a valid, null-terminated string.
+ * @param[in] hDownloadReq  Handle to CCSP_CWMP_MCO_DOWNLOAD_REQ structure.
+ *                           Contains URL, file type, credentials, delay, and callback URLs.
+ *
+ * @return Status of the operation.
+ * @retval ANSC_STATUS_SUCCESS if download is initiated successfully.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPMCOIF_DOWNLOAD)
     (
@@ -214,6 +449,22 @@ typedef  ANSC_STATUS
         ANSC_HANDLE                 hDownloadReq
     );
 
+/**
+ * @brief Function pointer type to handle Reboot RPC from ACS.
+ *
+ * This callback processes Reboot request, causing the CPE to reboot after
+ * completing current session and optional delay period.
+ *
+ * @param[in] hThisObject  Handle to the CWMP session object.
+ * @param[in] pRequestID   Pointer to request ID string.
+ *                          Must be a valid, null-terminated string.
+ * @param[in] pCommandKey  Pointer to command key string for tracking this reboot.
+ *                          Included in boot inform event after reboot.
+ *
+ * @return Status of the operation.
+ * @retval ANSC_STATUS_SUCCESS if reboot is scheduled successfully.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPMCOIF_REBOOT)
     (
@@ -222,6 +473,20 @@ typedef  ANSC_STATUS
         char*                       pCommandKey
     );
 
+/**
+ * @brief Function pointer type to handle GetQueuedTransfers RPC from ACS.
+ *
+ * This callback processes GetQueuedTransfers request, returning information about
+ * pending or in-progress download and upload operations.
+ *
+ * @param[in] hThisObject  Handle to the CWMP session object.
+ * @param[in] pRequestID   Pointer to request ID string.
+ *                          Must be a valid, null-terminated string.
+ *
+ * @return Status of the operation.
+ * @retval ANSC_STATUS_SUCCESS if queued transfers are returned successfully.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPMCOIF_GET_Q_TRANS)
     (
@@ -229,6 +494,24 @@ typedef  ANSC_STATUS
         char*                       pRequestID
     );
 
+/**
+ * @brief Function pointer type to handle ScheduleInform RPC from ACS.
+ *
+ * This callback processes ScheduleInform request, scheduling a future inform
+ * session to the ACS at the specified time offset.
+ *
+ * @param[in] hThisObject    Handle to the CWMP session object.
+ * @param[in] pRequestID     Pointer to request ID string.
+ *                            Must be a valid, null-terminated string.
+ * @param[in] ulDelaySeconds Time delay in seconds before inform.
+ *                            Valid range: 0 to ULONG_MAX.
+ * @param[in] pCommandKey    Pointer to command key string for this scheduled inform.
+ *                            Included in the scheduled inform event.
+ *
+ * @return Status of the operation.
+ * @retval ANSC_STATUS_SUCCESS if inform is scheduled successfully.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPMCOIF_SCHEDULE_IN)
     (
@@ -238,6 +521,22 @@ typedef  ANSC_STATUS
         char*                       pCommandKey
     );
 
+/**
+ * @brief Function pointer type to handle SetVouchers RPC from ACS.
+ *
+ * This callback processes SetVouchers request, setting voucher information
+ * for option-based services (optional RPC method).
+ *
+ * @param[in] hThisObject   Handle to the CWMP session object.
+ * @param[in] pRequestID    Pointer to request ID string.
+ *                           Must be a valid, null-terminated string.
+ * @param[in] pVoucherList  Pointer to string array containing voucher data.
+ *                           Each entry is a base64-encoded voucher.
+ *
+ * @return Status of the operation.
+ * @retval ANSC_STATUS_SUCCESS if vouchers are set successfully.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPMCOIF_SET_VOUCHER)
     (
@@ -246,6 +545,22 @@ typedef  ANSC_STATUS
         SLAP_STRING_ARRAY*          pVoucherList
     );
 
+/**
+ * @brief Function pointer type to handle GetOptions RPC from ACS.
+ *
+ * This callback processes GetOptions request, retrieving option information
+ * for specified service (optional RPC method).
+ *
+ * @param[in] hThisObject  Handle to the CWMP session object.
+ * @param[in] pRequestID   Pointer to request ID string.
+ *                          Must be a valid, null-terminated string.
+ * @param[in] pOptionName  Pointer to option name string to query.
+ *                          Must be a valid, null-terminated string.
+ *
+ * @return Status of the operation.
+ * @retval ANSC_STATUS_SUCCESS if options are retrieved successfully.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPMCOIF_GET_OPTIONS)
     (
@@ -254,6 +569,22 @@ typedef  ANSC_STATUS
         char*                       pOptionName
     );
 
+/**
+ * @brief Function pointer type to handle Upload RPC from ACS.
+ *
+ * This callback processes Upload request, causing the CPE to upload a file
+ * (such as logs or configuration) to the specified URL.
+ *
+ * @param[in] hThisObject  Handle to the CWMP session object.
+ * @param[in] pRequestID   Pointer to request ID string.
+ *                          Must be a valid, null-terminated string.
+ * @param[in] hUploadReq   Handle to CCSP_CWMP_MCO_UPLOAD_REQ structure.
+ *                          Contains URL, file type, credentials, and delay.
+ *
+ * @return Status of the operation.
+ * @retval ANSC_STATUS_SUCCESS if upload is initiated successfully.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPMCOIF_UPLOAD)
     (
@@ -262,6 +593,20 @@ typedef  ANSC_STATUS
         ANSC_HANDLE                 hUploadReq
     );
 
+/**
+ * @brief Function pointer type to handle FactoryReset RPC from ACS.
+ *
+ * This callback processes FactoryReset request, causing the CPE to reset
+ * all configuration parameters to factory default values and reboot.
+ *
+ * @param[in] hThisObject  Handle to the CWMP session object.
+ * @param[in] pRequestID   Pointer to request ID string.
+ *                          Must be a valid, null-terminated string.
+ *
+ * @return Status of the operation.
+ * @retval ANSC_STATUS_SUCCESS if factory reset is scheduled successfully.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPMCOIF_FACTORY_RES)
     (
@@ -269,6 +614,22 @@ typedef  ANSC_STATUS
         char*                       pRequestID
     );
 
+/**
+ * @brief Function pointer type to handle ChangeDUState RPC from ACS.
+ *
+ * This callback processes ChangeDUState (Change Deployment Unit State) request,
+ * managing software module installation, update, or uninstallation operations.
+ *
+ * @param[in] hThisObject  Handle to the CWMP session object.
+ * @param[in] pRequestID   Pointer to request ID string.
+ *                          Must be a valid, null-terminated string.
+ * @param[in] hCdsReq      Handle to ChangeDUState request structure.
+ *                          Contains operation type and deployment unit details.
+ *
+ * @return Status of the operation.
+ * @retval ANSC_STATUS_SUCCESS if DU state change is initiated successfully.
+ *
+ */
 typedef  ANSC_STATUS
 (*PFN_CWMPMCOIF_CHANGE_DU_STATE)
     (
@@ -277,6 +638,20 @@ typedef  ANSC_STATUS
         ANSC_HANDLE                 hCdsReq
     );
 
+/**
+ * @brief Function pointer type to get parameter data type.
+ *
+ * This callback retrieves the data type of a specified parameter, returning
+ * the CWMP type code.
+ *
+ * @param[in] hThisObject  Handle to the CWMP session object.
+ * @param[in] pParanName   Pointer to parameter name string.
+ *                          Must be a valid, full parameter path.
+ *
+ * @return Parameter data type identifier.
+ * @retval ULONG representing CWMP data type code.
+ *
+ */
 typedef  ULONG
 (*PFN_CWMPMCOIF_GET_PARAM_TYPE)
     (
