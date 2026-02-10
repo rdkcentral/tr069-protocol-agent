@@ -2818,6 +2818,7 @@ CcspCwmppoMpaGetParameterNames
     PCCSP_TR069PA_STRING_SLIST_ENTRY pSListEntry;
     PSINGLE_LINK_ENTRY              pLink;
     CCSP_STRING                     InternalName;
+    BOOL                            bRootPathflag        = FALSE;
 
     *ppParamInfoArray = NULL;
     *pulArraySize     = 0;
@@ -2854,6 +2855,10 @@ CcspCwmppoMpaGetParameterNames
     if ( !pParamPath || (AnscSizeOfString(pParamPath) == 0) )
     {
         pParamPath = pRootObjName;
+        if( bNextLevel )
+        {
+            bRootPathflag = TRUE;
+        }
     }
 
     if ( bNextLevel && !CcspCwmpIsPartialName(pParamPath) )
@@ -2884,6 +2889,9 @@ CcspCwmppoMpaGetParameterNames
     {
         pParamPath = pMappedParamPath;
     }
+
+    if (!bRootPathflag)
+    {
 
     pOriginalParam = pParamPath;
     if ( (pInternalNames = CcspTr069PA_GetParamInternalNames(pCcspCwmpCpeController->hTr069PaMapper, pParamPath)))
@@ -3114,6 +3122,12 @@ CcspCwmppoMpaGetParameterNames
 /*
     CcspTr069PaTraceDebug(("The ulParameterCount = %u\n", (unsigned int)ulParameterCount));
 */
+    }
+    else
+    {
+        ulParameterCount = 1;
+    }
+
     pCwmpParamInfoArray = (PCCSP_CWMP_PARAM_INFO)AnscAllocateMemory(sizeof(CCSP_CWMP_PARAM_INFO) * ulParameterCount);
 
     if ( !pCwmpParamInfoArray )
@@ -3124,21 +3138,29 @@ CcspCwmppoMpaGetParameterNames
 
     CcspTr069PaTraceDebug(("Total parameter count in 'GetParameterNames' == %u\n", (unsigned int)ulParameterCount));
 
-    i = 0;
-    pSLinkEntry = AnscQueueGetFirstEntry(&pFcNsList->NsList);
-    while ( pSLinkEntry )                                   
-    {                                                       
-        pNsList     = (PCCSP_TR069PA_NSLIST)ACCESS_CCSP_TR069PA_FC_NSLIST(pSLinkEntry);
-        pSLinkEntry = AnscQueueGetNextEntry(pSLinkEntry);
+    if (!bRootPathflag)
+    {
+        i = 0;
+        pSLinkEntry = AnscQueueGetFirstEntry(&pFcNsList->NsList);
+        while ( pSLinkEntry )
+        {
+            pNsList     = (PCCSP_TR069PA_NSLIST)ACCESS_CCSP_TR069PA_FC_NSLIST(pSLinkEntry);
+            pSLinkEntry = AnscQueueGetNextEntry(pSLinkEntry);
 
-        pCwmpParamInfoArray[i].Name      = pNsList->Args.paramInfo.parameterName;
+            pCwmpParamInfoArray[i].Name      = pNsList->Args.paramInfo.parameterName;
 
-        /* Map DM instance to CWMP instance for returned names */
-        CcspCwmppoMpaMapParamInstNumDmIntToCwmp(pCwmpParamInfoArray[i].Name);
+            /* Map DM instance to CWMP instance for returned names */
+            CcspCwmppoMpaMapParamInstNumDmIntToCwmp(pCwmpParamInfoArray[i].Name);
 
-        pCwmpParamInfoArray[i++].bWritable = pNsList->Args.paramInfo.writable;
+            pCwmpParamInfoArray[i++].bWritable = pNsList->Args.paramInfo.writable;
 
-        pNsList->Args.paramInfo.parameterName = NULL;
+            pNsList->Args.paramInfo.parameterName = NULL;
+        }
+    }
+    else
+    {
+            pCwmpParamInfoArray[0].Name = strdup("Device.");
+            pCwmpParamInfoArray[0].bWritable = 0;
     }
 
 EXIT3:
