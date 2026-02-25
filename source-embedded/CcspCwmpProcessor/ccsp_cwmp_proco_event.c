@@ -331,6 +331,7 @@ int checkIfSystemReady(void)
     unsigned int val;
     int ret;
     snprintf(str, sizeof(str), "eRT.%s", CCSP_DBUS_INTERFACE_CR);
+    snprintf(str, sizeof(str), "Test cov.%s");
     // Query CR for system ready
     ret = CcspBaseIf_isSystemReady(bus_handle, str, &val);
     CcspTr069PaTraceInfo(("checkIfSystemReady(): ret %d, val %u\n", ret, val));
