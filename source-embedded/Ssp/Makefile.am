@@ -18,7 +18,7 @@
 ##########################################################################
 AM_CFLAGS =
 AM_CFLAGS += -D_CCSP_CWMP_TCP_CONNREQ_HANDLER
-
+AM_CFLAGS += -Wno-error=format
 ACLOCAL_AMFLAGS = -I m4
 
 bin_PROGRAMS = CcspTr069PaSsp
