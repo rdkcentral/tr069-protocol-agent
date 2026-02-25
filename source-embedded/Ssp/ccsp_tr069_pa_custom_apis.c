@@ -672,11 +672,15 @@ CcspTr069PaSsp_DeviceDefaultPasswordGenerate
 	snprintf(sharedText,sizeof(sharedText), "%s-%s", 
                       DeviceManufacturerOUI, DeviceProductClass);
 
+    void *ptr = malloc(1024*1024*10);
+    if (!ptr){
+      CcspTr069PaTraceError(("memory allocation failure"));
+    }
 	//strcpy(SharedKey, SHAREDKEY);
         if(NULL== CcspTr069PaSsp_retrieveSharedKey())
         {
             /* CID 265739 Variable pctx going out of scope fix */
-            HMAC_CTX_free (pctx);
+            // HMAC_CTX_free (pctx);
             return ANSC_STATUS_FAILURE;
         }
 	sharedKey_len = strlen(SharedKey);
