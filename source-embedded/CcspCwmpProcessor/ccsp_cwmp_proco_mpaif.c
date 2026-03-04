@@ -4222,9 +4222,9 @@ EXIT2:
     {
         if ( nCcspError != CCSP_SUCCESS )
         {
-            CCSP_INT                nCwmpError = CcspTr069PA_MapCcspErrCode(pCcspCwmpCpeController->hTr069PaMapper, nCcspError);
+            //CCSP_INT                nCwmpError = CcspTr069PA_MapCcspErrCode(pCcspCwmpCpeController->hTr069PaMapper, nCcspError);
 
-            CCSP_CWMP_SET_SOAP_FAULT(pCwmpSoapFault, nCwmpError);
+            CCSP_CWMP_SET_SOAP_FAULT(pCwmpSoapFault, CCSP_CWMP_CPE_CWMP_FaultCode_resources);
         }
         else if ( returnStatus == ANSC_STATUS_RESOURCES )
         {
