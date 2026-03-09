@@ -173,7 +173,7 @@ CcspCwmpsoAddCwmpEvent
                 ERR_CHK(rc);                
                 if((rc == EOK) && (!ind))
                 {
-                    if((!pCcspCwmpEvent->CommandKey && !pCcspCwmpEventExist->CommandKey) ||
+                    if((!pCcspCwmpEvent->CommandKey && !pCcspCwmpEventExist->CommandKey) &&
                         (!strlen(pCcspCwmpEvent->CommandKey) && !strlen(pCcspCwmpEventExist->CommandKey)))
                     {
                         check = TRUE;
