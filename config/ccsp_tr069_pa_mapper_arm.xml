@@ -735,6 +735,15 @@
             <Name>Device.Time.LocalTimeZone</Name>
         </Param>
         <Param>
+            <Name>Device.Time.TimeOffset</Name>
+        </Param>
+        <Param>
+            <Name>Device.Time.UTC_Enable</Name>
+        </Param>
+        <Param>
+            <Name>Device.Time.X_RDK_CurrentUTCTime</Name>
+        </Param>
+        <Param>
             <Name>Device.UserInterface.X_CISCO_COM_RemoteAccess.Enable</Name>
         </Param>
         <Param>
