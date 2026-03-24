@@ -177,6 +177,11 @@ CcspCwmpsoAddCwmpEvent
                     {
                         check = TRUE;
                     }
+                    else if((pCcspCwmpEvent->CommandKey && pCcspCwmpEventExist->CommandKey) &&
+                        (!strlen(pCcspCwmpEvent->CommandKey) && !strlen(pCcspCwmpEventExist->CommandKey)))
+                    {
+                        check = TRUE;
+                    }
                 }
                 if(check == FALSE)
                 {
