@@ -526,6 +526,12 @@ CcspCwmpTcpcrhoIsValidConnRequest
     {
         pPathEnd = pLWS;
     }
+    pLWS = _ansc_memchr(pPath, '?', pMsgEnd - pPath + 1);
+    if ( pLWS && pLWS < pPathEnd )
+    {
+        pPathEnd = pLWS;
+    }
+
     if ( pPathEnd > pReqLineEnd )
     {
         return  FALSE;      /* HTTP/1.1 is missing */
