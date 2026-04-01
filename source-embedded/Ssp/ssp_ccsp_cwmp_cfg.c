@@ -82,6 +82,7 @@
 #include "cJSON.h"
 #include "secure_wrapper.h"
 #include "sysevent/sysevent.h"
+#include "syscfg/syscfg.h"
 
 extern int s_sysevent_connect (token_t *out_se_token);
 
@@ -114,7 +115,8 @@ extern char* g_Tr069PaOutboundIfName;
 #define CCSP_TR069PA_CFG_Name_AcsDefAddr		"Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69ACSConnectURL"
 extern char* g_Tr069PaAcsDefAddr;
 
-bool g_is_bridge_mode_enabled = false;
+BridgeModeStatus g_bridge_mode_value = MODE_ROUTER;
+
 
 #define DEVICE_PROPERTIES    "/etc/device.properties"
 
@@ -319,6 +321,37 @@ ANSC_STATUS CcspTr069PaSsp_JSON_GetItemByName    (
 	return ANSC_STATUS_SUCCESS;
 }
 
+/* Checks bridge_mode sysevent and last_erouter_mode syscfg to distingush between
+ * full-bridge and pseudo bridge. For pseudo bridge and router mode function returns
+ * MODE_PSEUDO_BRIDGE, MODE_ROUTER respectively and Full bridge return MODE_FULL_BRIDGE */
+static BridgeModeStatus Check_BridgeMode(void)
+{
+    token_t token;
+    char buf[2] = {'\0'}; /* buffer for string with single digit number */
+    int sysevent_fd = s_sysevent_connect(&token);
+    if (sysevent_fd < 0) {
+        CcspTr069PaTraceError(("%s: sysevent_connect failed!!!\n", __func__));
+        return MODE_ERROR;
+    }
+    if (sysevent_get(sysevent_fd, token, "bridge_mode", buf, sizeof(buf)) != 0) {
+        CcspTr069PaTraceError(("%s: sysevent_get('bridge_mode') failed!!!\n", __func__));
+        return MODE_ERROR;
+    }
+    CcspTr069PaTraceInfo(("%s: bridge_mode from sysevent = '%s'\n", __func__, buf));
+    if (strcmp(buf, "2") != 0)
+        return MODE_ROUTER;
+
+    if (syscfg_get(NULL, "last_erouter_mode", buf, sizeof(buf)) != 0) {
+        CcspTr069PaTraceError(("%s: syscfg_get('last_erouter_mode') failed!!!\n", __func__));
+        return MODE_ERROR;
+    }
+    CcspTr069PaTraceInfo(("%s: last_erouter_mode from syscfg = '%s'\n", __func__, buf));
+    if (strcmp(buf, "0") != 0)
+        return MODE_PSEUDO_BRIDGE;
+
+    return MODE_FULL_BRIDGE;
+}
+
 ANSC_STATUS  
 CcspTr069PaSsp_LoadCfgFile
     (
@@ -416,34 +449,16 @@ CcspTr069PaSsp_LoadCfgFile
         }
 
 #endif
-        
-        token_t token;
-        int sysevent_fd = s_sysevent_connect(&token);
-        if (sysevent_fd < 0) {
-            CcspTr069PaTraceError(("%s: sysevent_connect failed!!!\n", __func__));
+
+        g_bridge_mode_value = Check_BridgeMode();
+        if (g_bridge_mode_value == MODE_FULL_BRIDGE) {
+            CcspTr069PaSsp_XML_GetOneItemByName(pRootNode, CCSP_TR069PA_CFG_Name_Outbound_If_Bridge_Mode, &g_Tr069PaOutboundIfName);
+        } else if ((g_bridge_mode_value == MODE_ROUTER) || (g_bridge_mode_value == MODE_PSEUDO_BRIDGE)) {
+            CcspTr069PaSsp_XML_GetOneItemByName(pRootNode, CCSP_TR069PA_CFG_Name_Outbound_If, &g_Tr069PaOutboundIfName);
+        } else {
             returnStatus = ANSC_STATUS_FAILURE;
             goto EXIT;
-        } else {
-            char *entry_name = "bridge_mode";
-
-            char buf[2] = {'\0'}; /* buffer for string with single digit number */
-            if (sysevent_get(sysevent_fd, token, entry_name, buf, sizeof(buf)) == 0) {
-                 CcspTr069PaTraceInfo(("%s: bridge_mode from sysevent = '%s'\n", __func__, buf));
-
-                 int cmp_result = -1;
-                 strcmp_s(buf, sizeof(buf), "2", &cmp_result);
-                 g_is_bridge_mode_enabled = (cmp_result == 0);
-            } else {
-                CcspTr069PaTraceError(("%s: sysevent_get('%s') failed!!!\n", __func__, entry_name));
-                returnStatus = ANSC_STATUS_FAILURE;
-                goto EXIT;
-            }
         }
-
-        if (g_is_bridge_mode_enabled)
-            CcspTr069PaSsp_XML_GetOneItemByName(pRootNode, CCSP_TR069PA_CFG_Name_Outbound_If_Bridge_Mode, &g_Tr069PaOutboundIfName);
-        else
-            CcspTr069PaSsp_XML_GetOneItemByName(pRootNode, CCSP_TR069PA_CFG_Name_Outbound_If, &g_Tr069PaOutboundIfName);
 
 	if(ANSC_STATUS_SUCCESS != CcspTr069PaSsp_JSON_GetItemByName(partnerID, CCSP_TR069PA_CFG_Name_AcsDefAddr, &g_Tr069PaAcsDefAddr)) {
 		returnStatus = ANSC_STATUS_FAILURE;

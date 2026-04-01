@@ -124,6 +124,13 @@ _CCSP_VARIABLE
 }
 CCSP_VARIABLE, *PCCSP_VARIABLE;
 
+typedef enum
+{
+    MODE_ERROR = -1,
+    MODE_ROUTER = 0,
+    MODE_PSEUDO_BRIDGE = 2,
+    MODE_FULL_BRIDGE = 3
+}BridgeModeStatus;
 
 #define  CcspVariableInitialize(ccspVar)                                    \
     do {                                                                    \
