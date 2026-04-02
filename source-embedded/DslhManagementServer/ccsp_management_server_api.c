@@ -74,6 +74,7 @@
 extern char *CcspManagementServer_ComponentName;
 extern msObjectInfo *objectInfo;
 extern msParameterValSettingArray parameterSetting;
+extern CCSP_BOOL s_MS_Init_Done;
 
 int CcspManagementServer_SetParameterValues(
     int sessionId,
@@ -85,6 +86,12 @@ int CcspManagementServer_SetParameterValues(
     void            *user_data
     )
 {
+    if(s_MS_Init_Done != TRUE)
+    {
+        CcspTraceError(("%s:%d Management server is not ready!!! \n", __FUNCTION__, __LINE__));
+        return CCSP_FAILURE;
+    }
+
     //CcspTraceWarning("ms", ( "CcspManagementServer_SetParameterValues 0: %d.\n", commit)); 
     /*  Validate first. At the same time the values are stored in to parameterSetting. */
     int validateResult = CcspManagementServer_ValidateParameterValues(sessionId, writeID, val, size, invalidParameterName);
@@ -112,6 +119,11 @@ int  CcspManagementServer_SetCommit(
 {
     UNREFERENCED_PARAMETER(sessionId);
     UNREFERENCED_PARAMETER(user_data);
+    if(s_MS_Init_Done != TRUE)
+    {
+        CcspTraceError(("%s:%d Management server is not ready!!! \n", __FUNCTION__, __LINE__));
+        return CCSP_FAILURE;
+    }
     if(commit)
     {
         CcspManagementServer_CommitParameterValues(writeID);
@@ -133,6 +145,11 @@ int  CcspManagementServer_GetParameterValues(
 {
     UNREFERENCED_PARAMETER(writeID);
     UNREFERENCED_PARAMETER(user_data);
+    if(s_MS_Init_Done != TRUE)
+    {
+        CcspTraceError(("%s:%d Management server is not ready!!! \n", __FUNCTION__, __LINE__));
+        return CCSP_FAILURE;
+    }
     /* first count return size. */
     int i = 0;
     *val_size = 0;
@@ -211,6 +228,11 @@ int  CcspManagementServer_SetParameterAttributes(
 )
 {
     UNREFERENCED_PARAMETER(user_data);
+    if(s_MS_Init_Done != TRUE)
+    {
+        CcspTraceError(("%s:%d Management server is not ready!!! \n", __FUNCTION__, __LINE__));
+        return CCSP_FAILURE;
+    }
     int i = 0;
     for(; i<size; i++)
     {
@@ -256,6 +278,11 @@ int  CcspManagementServer_GetParameterAttributes(
 )
 {
     UNREFERENCED_PARAMETER(user_data);
+    if(s_MS_Init_Done != TRUE)
+    {
+        CcspTraceError(("%s:%d Management server is not ready!!! \n", __FUNCTION__, __LINE__));
+        return CCSP_FAILURE;
+    }
     /* first count return size. */
     int i = 0;
     *val_size = 0;
@@ -422,6 +449,11 @@ int CcspManagementServer_GetParameterNames(
 )
 {
     UNREFERENCED_PARAMETER(user_data);
+    if(s_MS_Init_Done != TRUE)
+    {
+        CcspTraceError(("%s:%d Management server is not ready!!! \n", __FUNCTION__, __LINE__));
+        return CCSP_FAILURE;
+    }
     char *name;
     errno_t rc = -1;
     //CcspTraceWarning("sample_component", ( "CcspManagementServer_GetParameterNames 1: %s\n", parameterName));
