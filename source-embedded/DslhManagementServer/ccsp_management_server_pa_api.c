@@ -112,7 +112,7 @@ extern char             *pFirstUpstreamIpAddress;
 
 extern char             *g_Tr069PaAcsDefAddr;
 extern char             *_SupportedDataModelConfigFile;
-static CCSP_BOOL        s_MS_Init_Done  = FALSE;
+CCSP_BOOL               s_MS_Init_Done  = FALSE;
 
 extern void waitUntilSystemReady(   void*   cbContext);
 
