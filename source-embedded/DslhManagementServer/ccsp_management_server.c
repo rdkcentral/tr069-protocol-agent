@@ -99,7 +99,7 @@
 
 extern PCCSP_CWMP_CPE_CONTROLLER_OBJECT g_pCcspCwmpCpeController;
 extern char* g_Tr069PaOutboundIfName;
-extern bool g_is_bridge_mode_enabled;
+extern BridgeModeStatus g_bridge_mode_value;
 
 
 char *CcspManagementServer_ComponentName = NULL;
@@ -1063,7 +1063,7 @@ ANSC_STATUS CcspManagementServer_GenerateConnectionRequestURL(
     int res;
     if(!fromValueChangeSignal){
 #ifndef NO_PAM_COMP
-        if (g_is_bridge_mode_enabled) {
+        if (g_bridge_mode_value == MODE_FULL_BRIDGE) {
             bool OutboundIfName_ip_found = false;
 
             struct ifaddrs *if_addrs = NULL;
