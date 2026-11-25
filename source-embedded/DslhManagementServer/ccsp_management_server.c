@@ -876,6 +876,89 @@ CcspManagementServer_UtilFreeParameterValStruct
     return  ANSC_STATUS_SUCCESS;
 }
 
+ANSC_STATUS
+CcspManagementServer_ApplyNewOutboundAndKickAcs()
+{
+    if (!RegisterWanInterfaceDone)
+    {
+       CcspTraceInfo (("%s: initial registration, skip ACS kick\n", __FUNCTION__));
+       return ANSC_STATUS_SUCCESS;
+    }
+    if (!g_pCcspCwmpCpeController)
+    {
+       CcspTraceError (("%s: g_pCcspCwmpCpeController is NULL\n", __FUNCTION__));
+       return ANSC_STATUS_FAILURE;
+    }
+    if (!pFirstUpstreamIpInterface || !pFirstUpstreamIpInterface[0])
+    {
+       CcspTraceError (("%s: pFirstUpstreamIpInterface is empty\n", __FUNCTION__));
+       return ANSC_STATUS_FAILURE;
+    }
+
+    char pIfNameParam[256] = {0};
+    char *pIfNameParamList[1];
+    parameterValStruct_t **pIfNameVal = NULL;
+    int ifNameValSize = 0;
+    errno_t rcIf = -1;
+
+    rcIf = strcpy_s(pIfNameParam, sizeof(pIfNameParam), pFirstUpstreamIpInterface);
+    ERR_CHK(rcIf);
+    rcIf = strcat_s(pIfNameParam, sizeof(pIfNameParam), "Name");
+    ERR_CHK(rcIf);
+
+    pIfNameParamList[0] = pIfNameParam;
+    int ifNameRes = CcspBaseIf_getParameterValues(
+            bus_handle,
+            pPAMComponentName,
+            pPAMComponentPath,
+            pIfNameParamList,
+            1,
+            &ifNameValSize,
+            &pIfNameVal);
+
+     if (ifNameRes != CCSP_SUCCESS)
+     {
+          CcspTraceError(("%s: getParameterValues failed for %s res=%d, OutboundIfName unchanged\n", __FUNCTION__, pIfNameParam, ifNameRes));
+     }
+     else if (ifNameValSize <= 0 || !pIfNameVal || !pIfNameVal[0] || !pIfNameVal[0]->parameterValue || !pIfNameVal[0]->parameterValue[0])
+     {
+           CcspTraceError(("%s: empty value for %s, OutboundIfName unchanged\n", __FUNCTION__, pIfNameParam));
+     }
+     else
+     {
+           char *pNewIfName = AnscCloneString(pIfNameVal[0]->parameterValue);
+           if (!pNewIfName)
+           {
+               CcspTraceError(("%s: AnscCloneString failed for ifname '%s'\n", __FUNCTION__, pIfNameVal[0]->parameterValue));
+
+               if (ifNameValSize > 0 && pIfNameVal)
+                  free_parameterValStruct_t(bus_handle, ifNameValSize, pIfNameVal);
+
+               return ANSC_STATUS_FAILURE;
+           }
+           else
+           {
+               CcspTraceInfo(("%s: updating OutboundIfName '%s' -> '%s'\n", __FUNCTION__,  g_Tr069PaOutboundIfName ? g_Tr069PaOutboundIfName : "(null)", pNewIfName));
+
+               /* Update controller bind interface before freeing old name */
+               g_pCcspCwmpCpeController->SetOutboundIfName((ANSC_HANDLE)g_pCcspCwmpCpeController, pNewIfName);
+
+               if (g_Tr069PaOutboundIfName)
+                   AnscFreeMemory(g_Tr069PaOutboundIfName);
+
+               g_Tr069PaOutboundIfName = pNewIfName;
+
+               /* Kick ACS retry so next connect uses new SO_BINDTODEVICE */
+               g_pCcspCwmpCpeController->NotifyEvent((ANSC_HANDLE)g_pCcspCwmpCpeController, CCSP_CWMP_CPECO_EVENT_InterfaceIpAddrChanged, (ANSC_HANDLE)NULL);
+               CcspTraceInfo(("%s: ACS rebind completed. ifname=%s SetOutboundIfName applied and InterfaceIpAddrChanged event sent\n", __FUNCTION__, pNewIfName));
+            }
+      }
+
+      if (ifNameValSize > 0 && pIfNameVal)
+           free_parameterValStruct_t(bus_handle, ifNameValSize, pIfNameVal);
+
+      return  ANSC_STATUS_SUCCESS;
+}
 
 ANSC_STATUS
 CcspManagementServer_RegisterWanInterface()
@@ -919,12 +1002,17 @@ CcspManagementServer_RegisterWanInterface()
     if( parameterNames[0]) AnscFreeMemory(parameterNames[0]);
 
     errno_t rc = -1;
+
+    if(pFirstUpstreamIpInterface) {
+        AnscFreeMemory(pFirstUpstreamIpInterface);
+        pFirstUpstreamIpInterface = NULL;
+    }
+
     if(val_size > 0) {
         pFirstUpstreamIpInterface = AnscCloneString(parameterval[0]->parameterValue);
 
         if(!pFirstUpstreamIpInterface) {
-	       rc = strcpy_s(pFirstUpstreamIpInterface, sizeof(pFirstUpstreamIpInterface), "Device.IP.Interface.1.");
-	       ERR_CHK(rc);
+	       pFirstUpstreamIpInterface = AnscCloneString("Device.IP.Interface.1."); 
         }
         free_parameterValStruct_t (bus_handle, val_size, parameterval);
     }
@@ -1281,12 +1369,13 @@ CcspManagementServer_paramValueChanged
     for(; i < size; i++){
         if(AnscEqualString((char *)(val[i].parameterName), pFirstUpstreamIpAddress, TRUE)){
             CcspManagementServer_GenerateConnectionRequestURL(TRUE, (char *)(val[i].newValue));
-            CcspTraceDebug(("CcspManagementServer_paramValueChanged %s %s\n", pFirstUpstreamIpAddress, val[i].newValue));
+            CcspTraceInfo(("CcspManagementServer_paramValueChanged %s %s\n", pFirstUpstreamIpAddress, val[i].newValue));
         }
         else if(AnscEqualString((char *)(val[i].parameterName), FirstUpstreamIpInterfaceParameterName, TRUE)){
             RegisterWanInterfaceDone = FALSE;
             CcspManagementServer_RegisterWanInterface();
-            CcspTraceDebug(("CcspManagementServer_paramValueChanged %s %s\n", FirstUpstreamIpInterfaceParameterName, val[i].newValue));
+            CcspManagementServer_ApplyNewOutboundAndKickAcs();
+            CcspTraceInfo(("CcspManagementServer_paramValueChanged %s %s\n", FirstUpstreamIpInterfaceParameterName, val[i].newValue));
         }
     }
     return TRUE;
