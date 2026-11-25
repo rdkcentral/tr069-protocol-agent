@@ -294,7 +294,7 @@ ANSC_STATUS CcspManagementServer_DiscoverComponent();
 *
 */
 ANSC_STATUS CcspManagementServer_RegisterWanInterface();
-
+ANSC_STATUS CcspManagementServer_ApplyNewOutboundAndKickAcs();
 /**
 * @brief Generate the Connection Request URL.
 *

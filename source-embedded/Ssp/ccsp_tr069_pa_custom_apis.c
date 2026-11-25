@@ -177,6 +177,11 @@ CcspCwmpsoInformCustom1
     UNREFERENCED_PARAMETER(pCcspCwmpCfgIf);
 }
 
+/* Set by CcspManagementServer_RegisterWanInterface()/paramValueChanged() in
+ * ccsp_management_server.c to the Device.IP.Interface.{i}. prefix of the currently active
+ * upstream WAN interface. */
+extern char *pFirstUpstreamIpInterface;
+
 ANSC_STATUS
 CcspCwmpsoInformPopulateTRInformationCustom
     (
@@ -187,6 +192,15 @@ CcspCwmpsoInformPopulateTRInformationCustom
 {
     ANSC_STATUS returnStatus = ANSC_STATUS_SUCCESS;
     ULONG index_start = *ulPresetParamCount;
+    const char *pIpInterfacePrefix = (pFirstUpstreamIpInterface && pFirstUpstreamIpInterface[0] != '\0') ?
+                                        pFirstUpstreamIpInterface : "Device.IP.Interface.1.";
+    char ipv4AddrParam[256]  = {0};
+    char ipv6Addr1Param[256] = {0};
+    char ipv6Addr2Param[256] = {0};
+
+    snprintf(ipv4AddrParam,  sizeof(ipv4AddrParam),  "%sIPv4Address.1.IPAddress", pIpInterfacePrefix);
+    snprintf(ipv6Addr1Param, sizeof(ipv6Addr1Param), "%sIPv6Address.1.IPAddress", pIpInterfacePrefix);
+    snprintf(ipv6Addr2Param, sizeof(ipv6Addr2Param), "%sIPv6Address.2.IPAddress", pIpInterfacePrefix);
 
     pCwmpParamValueArray[(*ulPresetParamCount)++].Name  = AnscCloneString("Device.DeviceSummary"                        );
     pCwmpParamValueArray[(*ulPresetParamCount)++].Name  = AnscCloneString("Device.DeviceInfo.HardwareVersion"           );
@@ -204,9 +218,9 @@ CcspCwmpsoInformPopulateTRInformationCustom
         pCwmpParamValueArray[(*ulPresetParamCount)++].Name  = AnscCloneString("Device.LAN.MACAddress"                   );
     }
 
-    pCwmpParamValueArray[(*ulPresetParamCount)++].Name  = AnscCloneString("Device.IP.Interface.1.IPv4Address.1.IPAddress");
-    pCwmpParamValueArray[(*ulPresetParamCount)++].Name  = AnscCloneString("Device.IP.Interface.1.IPv6Address.1.IPAddress");
-    pCwmpParamValueArray[(*ulPresetParamCount)++].Name  = AnscCloneString("Device.IP.Interface.1.IPv6Address.2.IPAddress");
+    pCwmpParamValueArray[(*ulPresetParamCount)++].Name  = AnscCloneString(ipv4AddrParam );
+    pCwmpParamValueArray[(*ulPresetParamCount)++].Name  = AnscCloneString(ipv6Addr1Param);
+    pCwmpParamValueArray[(*ulPresetParamCount)++].Name  = AnscCloneString(ipv6Addr2Param);
 
     if ( !pCwmpParamValueArray[index_start+0].Name ||
          !pCwmpParamValueArray[index_start+1].Name ||
